@@ -1,0 +1,88 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Azerta - Mesa de Ayuda{% endblock %}</title>
+  <meta name="description" content="{% block description %}Plataforma de Tickets y Mesa de Ayuda Azerta{% endblock %}">
+
+  <!-- Google Fonts: Lato -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <!-- Azerta Navigation Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'login' %}{% endif %}" class="brand-link" id="brand-logo" aria-label="Azerta Inicio">
+        <!-- Azerta Official SVG Logo -->
+        <svg width="124" height="26" viewBox="0 0 132 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g>
+            <path d="M5.32289 20.1258H16.6595C14.7651 15.3808 13.0657 11.3924 11.1501 6.64735L5.32289 20.1258ZM19.8295 28L17.3757 22.0025H4.60667C4.34392 22.695 3.95402 23.52 3.65737 24.1783C3.1361 25.3967 2.44955 26.8458 1.99185 28H0L10.4212 3.51819H11.9214L21.8849 28H19.8295Z" fill="#FFFFFF" />
+            <path d="M24.8896 28V26.4824L40.3413 5.72393H24.9193V3.84729H42.918V5.36485L27.4706 26.1233H42.918V28H24.8896Z" fill="#FFFFFF" />
+            <path d="M57.8441 18.6424H47.9824V26.1233H62.6458V28H46.1177V3.84729H62.6458V5.72821H47.9824V16.7316H57.8441V18.6424Z" fill="#FFFFFF" />
+            <path d="M72.1853 18.6424C76.4614 18.6424 80.5468 16.6674 80.5468 12.1832C80.5468 7.77157 76.9191 5.69401 72.5752 5.69401H67.6761V18.6424H72.1853ZM65.7817 28V3.84729H72.5625C77.8854 3.84729 82.3607 6.51905 82.3607 12.1832C82.3607 16.1032 79.7797 18.9716 76.2199 20.0232C77.6565 23.0583 79.9789 25.6616 83.3735 28H80.14C77.6037 25.9982 75.6143 23.3781 74.3594 20.3865C73.249 20.4848 70.7995 20.519 70.0155 20.519H67.6634V28H65.7817Z" fill="#FFFFFF" />
+            <path d="M95.9601 28H94.0657V5.72393H85.5093V3.84729H104.521V5.72393H95.9601V28Z" fill="#FFFFFF" />
+            <path d="M106.25 20.1258H117.587C115.696 15.3893 114.001 11.3924 112.098 6.64735L106.25 20.1258ZM120.752 28L118.303 22.0153H105.525C105.267 22.7078 104.873 23.5328 104.58 24.1912C104.059 25.4095 103.372 26.8586 102.915 28.0128H100.923L111.344 3.51819H112.848L122.812 28H120.752Z" fill="#FFFFFF" />
+            <!-- Fuchsia Accent Triangle on A -->
+            <path d="M118.96 0L120.295 2.32977H127.55L123.923 8.66931L125.482 11.3881L132 0H118.96Z" fill="#FF0066" />
+          </g>
+        </svg>
+      </a>
+
+      <nav class="nav-links">
+        {% if user.is_authenticated %}
+          <a href="{% url 'dashboard' %}" class="nav-link">Mesa de Ayuda</a>
+          {% if user.is_staff or user.is_superuser %}
+            <a href="/admin/" target="_blank" rel="noopener" class="nav-link">Admin Django</a>
+          {% endif %}
+          <div class="user-badge">
+            <span style="font-weight: 700;">{{ user.username }}</span>
+            <span class="role-tag" style="padding: 1px 6px; font-size: 10px;">
+              {% if user.is_staff or user.is_superuser %}Admin{% else %}Usuario{% endif %}
+            </span>
+            <form action="{% url 'logout' %}" method="post" style="display:inline; margin-left: 4px;">
+              {% csrf_token %}
+              <button type="submit" class="btn-logout">Salir</button>
+            </form>
+          </div>
+        {% else %}
+          <a href="https://www.azerta.cl" target="_blank" rel="noopener" class="nav-link">Sitio Web Azerta</a>
+          <a href="{% url 'login' %}" class="btn-azerta-primary" style="padding: 8px 18px; font-size: 13px; width: auto;" id="nav-login-btn">Acceso</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content Body -->
+  <div class="main-wrapper">
+    <div style="width: 100%; max-width: 1200px; margin: 0 auto;">
+      {% if messages %}
+        <div class="messages-container" style="max-width: 600px; margin: 0 auto 24px;">
+          {% for message in messages %}
+            <div class="azerta-alert {% if message.tags == 'error' %}azerta-alert-error{% elif message.tags == 'success' %}azerta-alert-success{% else %}azerta-alert-info{% endif %}">
+              <span>{{ message }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% block content %}
+      {% endblock %}
+    </div>
+  </div>
+
+  <!-- Azerta Footer -->
+  <footer class="site-footer">
+    <p>&copy; {% now "Y" %} <a href="https://www.azerta.cl" target="_blank">Azerta</a>. Plataforma de Soporte &amp; Mesa de Ayuda TI.</p>
+  </footer>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

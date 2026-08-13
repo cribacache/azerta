@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Ticket #{{ ticket.id }} - {{ ticket.title }} | Azerta{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  
+  <div style="margin-bottom: 24px;">
+    <a href="{% url 'dashboard' %}" class="btn-azerta-secondary" style="margin-bottom: 16px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Volver al Dashboard
+    </a>
+  </div>
+
+  <div class="ticket-detail-grid">
+    
+    <!-- Main Details Panel -->
+    <div class="panel-card">
+      <div class="detail-header">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
+          <div>
+            <span style="color: var(--color-primary); font-weight: 800; font-size: 14px; text-transform: uppercase;">
+              Ticket #{{ ticket.id }}
+            </span>
+            <h1 style="font-size: 26px; font-weight: 800; color: var(--color-white); margin-top: 4px;">
+              {{ ticket.title }}
+            </h1>
+          </div>
+          <div>
+            {% if ticket.status == 'PENDIENTE' %}
+              <span class="badge badge-pending">Pendiente</span>
+            {% elif ticket.status == 'EN_PROCESO' %}
+              <span class="badge badge-progress">En Proceso</span>
+            {% elif ticket.status == 'RESUELTO' %}
+              <span class="badge badge-resolved">Resuelto</span>
+            {% else %}
+              <span class="badge badge-closed">Cerrado</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 28px;">
+        <h3 style="font-size: 15px; text-transform: uppercase; color: var(--color-grey-400); letter-spacing: 0.03em; margin-bottom: 8px;">
+          Descripción de la Solicitud
+        </h3>
+        <div class="detail-description-box">
+          {{ ticket.description }}
+        </div>
+      </div>
+
+      {% if ticket.admin_notes %}
+        <div style="margin-top: 24px; padding: 20px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px;">
+          <h4 style="color: #34D399; font-size: 14px; text-transform: uppercase; margin-bottom: 8px; font-weight: 800;">
+            Respuesta / Notas del Administrador de TI
+          </h4>
+          <p style="color: var(--color-grey-100); font-size: 14px; line-height: 1.6; white-space: pre-line;">
+            {{ ticket.admin_notes }}
+          </p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Sidebar: Meta Information or Admin Controls -->
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+      
+      <!-- Meta Information Card -->
+      <div class="panel-card">
+        <h3 style="font-size: 16px; font-weight: 800; color: var(--color-white); margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px;">
+          Información del Ticket
+        </h3>
+        
+        <div class="detail-meta-list">
+          <div class="detail-meta-item">
+            <span class="detail-meta-label">Solicitante:</span>
+            <span class="detail-meta-val">{{ ticket.created_by.get_full_name|default:ticket.created_by.username }}</span>
+          </div>
+          <div class="detail-meta-item">
+            <span class="detail-meta-label">Email:</span>
+            <span class="detail-meta-val" style="font-size: 12px;">{{ ticket.created_by.email }}</span>
+          </div>
+          <div class="detail-meta-item">
+            <span class="detail-meta-label">Categoría:</span>
+            <span class="detail-meta-val">{{ ticket.get_category_display }}</span>
+          </div>
+          <div class="detail-meta-item">
+            <span class="detail-meta-label">Prioridad:</span>
+            <div class="priority-tag priority-{{ ticket.priority|lower }}">
+              <span class="priority-dot"></span>
+              <span>{{ ticket.get_priority_display }}</span>
+            </div>
+          </div>
+          <div class="detail-meta-item">
+            <span class="detail-meta-label">Creado:</span>
+            <span class="detail-meta-val" style="font-size: 13px;">{{ ticket.created_at|date:"d/m/Y H:i" }}</span>
+          </div>
+          <div class="detail-meta-item">
+            <span class="detail-meta-label">Actualizado:</span>
+            <span class="detail-meta-val" style="font-size: 13px;">{{ ticket.updated_at|date:"d/m/Y H:i" }}</span>
+          </div>
+        </div>
+      </div>
+
+      {% if is_admin %}
+        <!-- Admin Management Form -->
+        <div class="panel-card" style="border-top: 3px solid var(--color-primary);">
+          <h3 style="font-size: 16px; font-weight: 800; color: var(--color-white); margin-bottom: 16px;">
+            Gestión de TI
+          </h3>
+
+          <form method="post" action="{% url 'ticket_detail' ticket.id %}" class="login-form">
+            {% csrf_token %}
+
+            <div class="form-group">
+              <label class="azerta-label">Cambiar Estado</label>
+              {{ admin_form.status }}
+            </div>
+
+            <div class="form-group">
+              <label class="azerta-label">Cambiar Prioridad</label>
+              {{ admin_form.priority }}
+            </div>
+
+            <div class="form-group">
+              <label class="azerta-label">Asignar Responsable</label>
+              {{ admin_form.assigned_to }}
+            </div>
+
+            <div class="form-group">
+              <label class="azerta-label">Notas de Resolución</label>
+              {{ admin_form.admin_notes }}
+            </div>
+
+            <button type="submit" class="btn-azerta-primary">
+              Guardar Cambios
+            </button>
+          </form>
+        </div>
+      {% endif %}
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

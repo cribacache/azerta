@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Plataforma | Azerta{% endblock %}
+
+{% block content %}
+<div class="home-container">
+  <section class="home-hero">
+    {% if user.is_authenticated %}
+      <h1>Hola, {{ user.get_full_name|default:user.username }}</h1>
+      <p>Bienvenido al portal interno de Azerta. Tu sesión está activa.</p>
+    {% else %}
+      <h1>Plataforma Azerta</h1>
+      <p>Consultoría en comunicación estratégica, asuntos públicos, comunicación digital y gestión de crisis.</p>
+      <div style="margin-top: 24px;">
+        <a href="{% url 'login' %}" class="btn-azerta-primary" style="display: inline-flex; width: auto; padding: 12px 32px;">
+          Ingresar a la Plataforma
+        </a>
+      </div>
+    {% endif %}
+    <div class="azerta-separator" style="margin-top: 24px;"></div>
+  </section>
+
+  <div class="cards-grid">
+    <div class="azerta-card">
+      <h3 style="color: var(--color-primary);">Comunicación Estratégica</h3>
+      <p>Diseño y ejecución de estrategias corporativas de alta visibilidad con visión integral de negocio.</p>
+    </div>
+
+    <div class="azerta-card">
+      <h3 style="color: var(--color-primary);">Gestión de Crisis</h3>
+      <p>Monitoreo continuo, protocolos de respuesta rápida y mitigación de riesgos reputacionales.</p>
+    </div>
+
+    <div class="azerta-card">
+      <h3 style="color: var(--color-primary);">Asuntos Públicos</h3>
+      <p>Análisis de entorno regulatorio, relacionamiento institucional y construcción de consensos.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
