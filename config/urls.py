@@ -10,6 +10,7 @@ from django.urls import path, include
 from django.shortcuts import redirect
 from django.conf import settings
 from django.conf.urls.static import static
+from types import MethodType
 
 
 def root_redirect(request):
@@ -17,6 +18,18 @@ def root_redirect(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
     return redirect('login')
+
+
+def restricted_admin_permission(self, request):
+    """Allow the Django admin only to real administrators, not TI staff."""
+    return (
+        request.user.is_active
+        and request.user.is_authenticated
+        and (request.user.is_superuser or request.user.role == 'ADMIN')
+    )
+
+
+admin.site.has_permission = MethodType(restricted_admin_permission, admin.site)
 
 
 urlpatterns = [

@@ -62,6 +62,21 @@
           </p>
         </div>
       {% endif %}
+
+      <div class="ticket-responses">
+        <h3 class="ticket-section-title">Historial de respuestas</h3>
+        {% for response in ticket.responses.all %}
+          <article class="ticket-response">
+            <div class="ticket-response-header">
+              <strong>{% if response.author %}{{ response.author.get_full_name|default:response.author.username }}{% else %}Usuario eliminado{% endif %}</strong>
+              <time datetime="{{ response.created_at|date:'c' }}">{{ response.created_at|date:"d/m/Y H:i:s" }}</time>
+            </div>
+            <p>{{ response.message }}</p>
+          </article>
+        {% empty %}
+          <p class="dashboard-subtitle">Aún no hay respuestas registradas.</p>
+        {% endfor %}
+      </div>
     </div>
 
     <!-- Sidebar: Meta Information or Admin Controls -->
@@ -76,11 +91,11 @@
         <div class="detail-meta-list">
           <div class="detail-meta-item">
             <span class="detail-meta-label">Solicitante:</span>
-            <span class="detail-meta-val">{{ ticket.created_by.get_full_name|default:ticket.created_by.username }}</span>
+            <span class="detail-meta-val">{% if ticket.created_by %}{{ ticket.created_by.get_full_name|default:ticket.created_by.username }}{% else %}Incidencia manual{% endif %}</span>
           </div>
           <div class="detail-meta-item">
             <span class="detail-meta-label">Email:</span>
-            <span class="detail-meta-val" style="font-size: 12px;">{{ ticket.created_by.email }}</span>
+            <span class="detail-meta-val" style="font-size: 12px;">{% if ticket.created_by %}{{ ticket.created_by.email }}{% else %}-{% endif %}</span>
           </div>
           <div class="detail-meta-item">
             <span class="detail-meta-label">Categoría:</span>
@@ -100,6 +115,14 @@
           <div class="detail-meta-item">
             <span class="detail-meta-label">Actualizado:</span>
             <span class="detail-meta-val" style="font-size: 13px;">{{ ticket.updated_at|date:"d/m/Y H:i" }}</span>
+          </div>
+          <div class="detail-meta-item">
+            <span class="detail-meta-label">Responsable:</span>
+            <span class="detail-meta-val">{% if ticket.assigned_to %}{{ ticket.assigned_to.get_full_name|default:ticket.assigned_to.username }}{% else %}Sin asignar{% endif %}</span>
+          </div>
+          <div class="detail-meta-item">
+            <span class="detail-meta-label">Tiempo de resolución:</span>
+            <span class="detail-meta-val live-timer" data-started-at="{{ ticket.started_at|date:'c' }}" data-resolved-at="{{ ticket.resolved_at|date:'c' }}">{% if ticket.resolution_duration %}{{ ticket.resolution_duration }}{% elif ticket.started_at %}En curso{% else %}No iniciado{% endif %}</span>
           </div>
         </div>
       </div>
@@ -134,10 +157,32 @@
               {{ admin_form.admin_notes }}
             </div>
 
+            <div class="form-group">
+              <label class="azerta-label">Nueva respuesta</label>
+              {{ admin_form.response }}
+            </div>
+
             <button type="submit" class="btn-azerta-primary">
               Guardar Cambios
             </button>
           </form>
+        </div>
+      {% elif is_ti and ticket.assigned_to_id == user.id %}
+        <div class="panel-card" style="border-top: 3px solid var(--color-primary);">
+          <h3 style="font-size: 16px; font-weight: 800; color: var(--color-white); margin-bottom: 16px;">Atención TI</h3>
+          {% if ticket.status == 'PENDIENTE' %}
+            <form method="post" action="{% url 'start_ticket' ticket.id %}">
+              {% csrf_token %}<button type="submit" class="btn-azerta-primary">Comenzar tarea</button>
+            </form>
+          {% else %}
+            <form method="post" action="{% url 'ticket_detail' ticket.id %}" class="login-form">
+              {% csrf_token %}
+              <div class="form-group"><label class="azerta-label">Estado</label><select name="status" class="azerta-select"><option value="EN_PROCESO" {% if ticket.status == 'EN_PROCESO' %}selected{% endif %}>En proceso</option><option value="RESUELTO" {% if ticket.status == 'RESUELTO' %}selected{% endif %}>Resuelto</option><option value="CERRADO" {% if ticket.status == 'CERRADO' %}selected{% endif %}>Cerrado</option></select></div>
+              <div class="form-group"><label class="azerta-label">Notas internas</label><textarea name="admin_notes" class="azerta-textarea" rows="3">{{ ticket.admin_notes }}</textarea></div>
+              <div class="form-group"><label class="azerta-label">Nueva respuesta</label><textarea name="response" class="azerta-textarea" rows="3" placeholder="Escriba una actualización para el historial..."></textarea></div>
+              <button type="submit" class="btn-azerta-primary">Actualizar tarea</button>
+            </form>
+          {% endif %}
         </div>
       {% endif %}
 
@@ -145,4 +190,27 @@
 
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function () {
+    function updateTimer() {
+      document.querySelectorAll('.live-timer[data-started-at]').forEach(function (timer) {
+        const startedAt = Date.parse(timer.dataset.startedAt);
+        const resolvedAt = timer.dataset.resolvedAt ? Date.parse(timer.dataset.resolvedAt) : Date.now();
+        if (Number.isNaN(startedAt) || Number.isNaN(resolvedAt)) return;
+        const totalSeconds = Math.max(0, Math.floor((resolvedAt - startedAt) / 1000));
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        timer.textContent = [hours, minutes, seconds].map(function (value) {
+          return String(value).padStart(2, '0');
+        }).join(':');
+      });
+    }
+    updateTimer();
+    window.setInterval(updateTimer, 1000);
+  }());
+</script>
 {% endblock %}

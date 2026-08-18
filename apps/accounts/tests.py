@@ -1,6 +1,9 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from apps.tickets.models import Ticket
+
+from .forms import build_initial_password
 
 
 class AzertaAuthTests(TestCase):
@@ -16,7 +19,7 @@ class AzertaAuthTests(TestCase):
     def test_login_page_renders_with_azerta_branding(self):
         response = self.client.get(reverse('login'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Acceso a Plataforma")
+        self.assertContains(response, "Mesa de Soporte")
         self.assertContains(response, "Azerta")
         self.assertContains(response, "#FF0066")
 
@@ -28,6 +31,16 @@ class AzertaAuthTests(TestCase):
         }, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.context['user'].is_authenticated)
+
+    def test_role_guide_can_be_dismissed_persistently(self):
+        self.client.login(username='azerta_user', password='SecurePassword123!')
+        dashboard = self.client.get(reverse('dashboard'))
+        self.assertContains(dashboard, 'Guía rápida')
+        response = self.client.post(reverse('dismiss_onboarding'), follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.onboarding_dismissed)
+        self.assertNotContains(response, 'Guía rápida')
 
     def test_invalid_login_shows_error(self):
         response = self.client.post(reverse('login'), {
@@ -42,3 +55,66 @@ class AzertaAuthTests(TestCase):
         response = self.client.post(reverse('logout'), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertFalse(response.context['user'].is_authenticated)
+
+    def test_staff_can_create_user_with_rut_login_and_initial_password(self):
+        self.client.login(username='azerta_user', password='SecurePassword123!')
+        self.user.is_staff = True
+        self.user.save(update_fields=['is_staff'])
+        response = self.client.post(reverse('user_create'), {
+            'rut': '12.345.678-5',
+            'first_name': 'Ana',
+            'last_name': 'Pérez',
+            'email': 'ana@azerta.cl',
+            'is_active': True,
+        }, follow=True)
+        self.assertEqual(response.status_code, 200)
+        created = self.User.objects.get(rut='12345678')
+        self.assertEqual(created.username, '12345678')
+        self.assertTrue(created.check_password(build_initial_password('Ana', '12345678')))
+
+    def test_regular_user_cannot_access_user_management(self):
+        self.client.login(username='azerta_user', password='SecurePassword123!')
+        response = self.client.get(reverse('user_list'))
+        self.assertRedirects(response, reverse('dashboard'))
+
+    def test_regular_user_cannot_access_django_admin_by_url(self):
+        self.client.login(username='azerta_user', password='SecurePassword123!')
+        response = self.client.get('/admin/')
+        self.assertRedirects(response, reverse('dashboard'))
+
+    def test_ti_cannot_access_django_admin_by_url(self):
+        ti = self.User.objects.create_user(
+            username='ti_admin_route', password='SecurePassword123!',
+            role=self.User.Role.TI, is_staff=True,
+        )
+        self.client.login(username=ti.username, password='SecurePassword123!')
+        response = self.client.get('/admin/')
+        self.assertRedirects(response, reverse('dashboard'))
+
+    def test_admin_can_access_django_admin_by_url(self):
+        admin_user = self.User.objects.create_superuser(
+            username='real_admin', password='SecurePassword123!',
+        )
+        self.client.login(username=admin_user.username, password='SecurePassword123!')
+        response = self.client.get('/admin/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_editing_user_keeps_support_history(self):
+        self.user.is_staff = True
+        self.user.rut = '12345678'
+        self.user.save(update_fields=['is_staff', 'rut'])
+        ticket = Ticket.objects.create(
+            title='Historial',
+            description='Solicitud previa',
+            created_by=self.user,
+        )
+        self.client.login(username='azerta_user', password='SecurePassword123!')
+        response = self.client.post(reverse('user_update', kwargs={'pk': self.user.pk}), {
+            'rut': '12345678',
+            'first_name': 'Carlos',
+            'last_name': 'Actualizado',
+            'email': 'nuevo@azerta.cl',
+            'is_active': True,
+        }, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Ticket.objects.get(pk=ticket.pk).created_by_id, self.user.pk)

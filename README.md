@@ -53,10 +53,22 @@ python manage.py createsuperuser
 ### 4. Start the Development Server
 
 ```bash
-python manage.py runserver 8000
+python manage.py runserver 0.0.0.0:8000
 ```
 
-Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser.
+Open `http://127.0.0.1:8000` on the server computer. To access the project from
+another computer on the same network, replace `127.0.0.1` with the server
+computer's local IP address, for example `http://192.168.1.25:8000`.
+
+On macOS, find the local IP with:
+
+```bash
+ipconfig getifaddr en0
+```
+
+If that returns no address and the Mac is connected over Wi-Fi or another
+interface, try `ipconfig getifaddr en1`. Both computers must be on the same
+network, and the macOS firewall must allow incoming connections to Python.
 
 ---
 

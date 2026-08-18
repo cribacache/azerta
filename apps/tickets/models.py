@@ -1,5 +1,8 @@
+from datetime import timedelta
+
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 
 
 class Ticket(models.Model):
@@ -48,7 +51,9 @@ class Ticket(models.Model):
     )
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name='tickets',
         verbose_name="Creado por"
     )
@@ -66,6 +71,22 @@ class Ticket(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creación")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Última actualización")
+    started_at = models.DateTimeField(null=True, blank=True, verbose_name="Inicio de atención")
+    resolved_at = models.DateTimeField(null=True, blank=True, verbose_name="Fin de atención")
+
+    @property
+    def resolution_seconds(self):
+        if not self.started_at:
+            return None
+        end = self.resolved_at or timezone.now()
+        return max(0, int((end - self.started_at).total_seconds()))
+
+    @property
+    def resolution_duration(self):
+        seconds = self.resolution_seconds
+        if seconds is None:
+            return ''
+        return str(timedelta(seconds=seconds))
 
     class Meta:
         ordering = ['-created_at']
@@ -74,3 +95,27 @@ class Ticket(models.Model):
 
     def __str__(self):
         return f"#{self.id} - {self.title} ({self.get_status_display()})"
+
+
+class TicketResponse(models.Model):
+    ticket = models.ForeignKey(
+        Ticket,
+        on_delete=models.CASCADE,
+        related_name='responses',
+        verbose_name='Incidencia',
+    )
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='ticket_responses',
+        verbose_name='Ingresado por',
+    )
+    message = models.TextField(verbose_name='Respuesta')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de ingreso')
+
+    class Meta:
+        ordering = ['created_at']
+        verbose_name = 'Respuesta de incidencia'
+        verbose_name_plural = 'Respuestas de incidencias'

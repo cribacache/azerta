@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Reportes de Incidencias | Azerta{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <div class="dashboard-header" style="display:flex; justify-content:space-between; align-items:end; gap:16px; flex-wrap:wrap;">
+    <div>
+      <h1 class="dashboard-title">Estado de incidencias</h1>
+      <p class="dashboard-subtitle">Resumen desde el {{ start_date|date:"d/m/Y" }}.</p>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <a href="?period=week" class="btn-azerta-secondary">Semana</a>
+      <a href="?period=month" class="btn-azerta-secondary">Mes</a>
+    </div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card stat-total"><span class="stat-label">Total</span><span class="stat-value">{{ summary.total }}</span></div>
+    <div class="stat-card stat-pending"><span class="stat-label">Pendientes</span><span class="stat-value">{{ summary.pending }}</span></div>
+    <div class="stat-card stat-progress"><span class="stat-label">En curso</span><span class="stat-value">{{ summary.in_progress }}</span></div>
+    <div class="stat-card stat-resolved"><span class="stat-label">Resueltas</span><span class="stat-value">{{ summary.resolved }}</span></div>
+  </div>
+  <div class="panel-card">
+    <h2 class="panel-title">Detalle del período</h2>
+    <div class="table-responsive">
+      <table class="tickets-table">
+        <thead><tr><th>ID</th><th>Asunto</th><th>Asignado</th><th>Estado</th><th>Creada</th><th>Resolución</th></tr></thead>
+        <tbody>
+          {% for ticket in tickets %}
+            <tr>
+              <td>#{{ ticket.id }}</td>
+              <td><a href="{% url 'ticket_detail' ticket.id %}" class="ticket-link">{{ ticket.title }}</a></td>
+              <td>{% if ticket.assigned_to %}{{ ticket.assigned_to.get_full_name|default:ticket.assigned_to.username }}{% else %}Sin asignar{% endif %}</td>
+              <td>{{ ticket.get_status_display }}</td>
+              <td>{{ ticket.created_at|date:"d/m/Y H:i" }}</td>
+              <td>{% if ticket.resolution_duration %}{{ ticket.resolution_duration }}{% else %}-{% endif %}</td>
+            </tr>
+          {% empty %}<tr><td colspan="6">No hay incidencias en este período.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

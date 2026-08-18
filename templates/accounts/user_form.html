@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} | Azerta{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1 class="dashboard-title">{{ page_title }}</h1>
+    <p class="dashboard-subtitle">El login del usuario será su RUT sin dígito verificador.</p>
+  </div>
+
+  <div class="user-layout-grid">
+    <div class="panel-card">
+      <form method="post" class="login-form">
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="azerta-alert azerta-alert-error">{{ form.non_field_errors }}</div>{% endif %}
+        {% for field in form %}
+          <div class="form-group">
+            {% if field.field.widget.input_type == 'checkbox' %}
+              <label class="checkbox-label">{{ field }} <span>{{ field.label }}</span></label>
+            {% else %}
+              <label for="{{ field.id_for_label }}" class="azerta-label">{{ field.label }}</label>
+              {{ field }}
+            {% endif %}
+            {% for error in field.errors %}<small style="color: #FF6186; font-size: 13px;">{{ error }}</small>{% endfor %}
+            {% if field.help_text %}<small style="color: var(--color-grey-500);">{{ field.help_text }}</small>{% endif %}
+          </div>
+        {% endfor %}
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <button type="submit" class="btn-azerta-primary">Guardar usuario</button>
+          <a href="{% url 'user_list' %}" class="btn-azerta-secondary">Cancelar</a>
+        </div>
+      </form>
+    </div>
+
+    {% if edit_user %}
+      <div class="panel-card">
+        <h2 class="panel-title">Historial de solicitudes</h2>
+        {% if edit_user.tickets.all %}
+          <div class="table-responsive">
+            <table class="tickets-table">
+              <thead><tr><th>Solicitud</th><th>Estado</th><th>Fecha</th></tr></thead>
+              <tbody>
+                {% for ticket in edit_user.tickets.all %}
+                  <tr>
+                    <td><a href="{% url 'ticket_detail' ticket.pk %}" class="ticket-link">#{{ ticket.pk }} · {{ ticket.title }}</a></td>
+                    <td>{{ ticket.get_status_display }}</td>
+                    <td>{{ ticket.created_at|date:"d/m/Y H:i" }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="dashboard-subtitle">Este usuario todavía no tiene solicitudes.</p>
+        {% endif %}
+      </div>
+    {% else %}
+      <div class="panel-card">
+        <h2 class="panel-title">Acceso inicial</h2>
+        <p class="dashboard-subtitle">La contraseña se genera como <strong>Nombre-RUT</strong>, por ejemplo: Carlos-12345678.</p>
+        <p class="dashboard-subtitle">Entrégala al usuario y recomienda cambiarla después del primer ingreso.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

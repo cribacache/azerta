@@ -1,265 +1,222 @@
 {% extends "base.html" %}
 
-{% block title %}Mesa de Ayuda & Tickets | Azerta{% endblock %}
+{% block title %}Dashboard Diario | Azerta{% endblock %}
 
 {% block content %}
 <div class="dashboard-container">
-  
-  <!-- Dashboard Header -->
-  <div class="dashboard-header">
+  <div class="dashboard-header" style="display:flex; justify-content:space-between; align-items:end; gap:16px; flex-wrap:wrap;">
     <div>
-      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-        <h1 class="dashboard-title">
-          {% if is_admin %}
-            Mesa de Ayuda TI & Plataformas
-          {% else %}
-            Portal de Soporte Interno
-          {% endif %}
-        </h1>
-        <span class="role-tag">
-          {% if is_admin %}Administrador{% else %}Usuario{% endif %}
-        </span>
-      </div>
-      <p class="dashboard-subtitle">
-        {% if is_admin %}
-          Gestión centralizada de requerimientos, accesos y soporte técnico de Azerta.
-        {% else %}
-          Cree y dé seguimiento a sus solicitudes de soporte técnico y plataformas.
-        {% endif %}
-      </p>
+      <h1 class="dashboard-title">Dashboard diario</h1>
+      <p class="dashboard-subtitle">Incidencias del {{ today|date:"d/m/Y" }}.</p>
     </div>
-  </div>
-
-  <!-- Metric Statistics Cards -->
-  <div class="stats-grid">
-    <div class="stat-card stat-total">
-      <span class="stat-label">Total Tickets</span>
-      <span class="stat-value">{{ stats.total }}</span>
-    </div>
-    <div class="stat-card stat-pending">
-      <span class="stat-label">Pendientes</span>
-      <span class="stat-value">{{ stats.pending }}</span>
-    </div>
-    <div class="stat-card stat-progress">
-      <span class="stat-label">En Proceso</span>
-      <span class="stat-value">{{ stats.in_progress }}</span>
-    </div>
-    <div class="stat-card stat-resolved">
-      <span class="stat-label">Resueltos</span>
-      <span class="stat-value">{{ stats.resolved }}</span>
-    </div>
-  </div>
-
-  {% if is_admin %}
-    <!-- =======================================================
-         ADMIN VIEW: FULL TICKET QUEUE & FILTERING
-         ======================================================= -->
-    <div class="panel-card">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
-        <h2 class="panel-title" style="margin-bottom: 0;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-primary);">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="16" y1="13" x2="8" y2="13"></line>
-            <line x1="16" y1="17" x2="8" y2="17"></line>
-            <polyline points="10 9 9 9 8 9"></polyline>
-          </svg>
-          Todos los Tickets de Soporte
-        </h2>
-
-        <!-- Status Filter Tabs -->
-        <div class="filter-tabs" style="margin-bottom: 0;">
-          <a href="{% url 'dashboard' %}" class="filter-tab {% if not status_filter %}active{% endif %}">Todos ({{ stats.total }})</a>
-          <a href="{% url 'dashboard' %}?status=PENDIENTE" class="filter-tab {% if status_filter == 'PENDIENTE' %}active{% endif %}">Pendientes ({{ stats.pending }})</a>
-          <a href="{% url 'dashboard' %}?status=EN_PROCESO" class="filter-tab {% if status_filter == 'EN_PROCESO' %}active{% endif %}">En Proceso ({{ stats.in_progress }})</a>
-          <a href="{% url 'dashboard' %}?status=RESUELTO" class="filter-tab {% if status_filter == 'RESUELTO' %}active{% endif %}">Resueltos ({{ stats.resolved }})</a>
-        </div>
-      </div>
-
-      {% if tickets %}
-        <div class="table-responsive">
-          <table class="tickets-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Asunto</th>
-                <th>Solicitante</th>
-                <th>Categoría</th>
-                <th>Prioridad</th>
-                <th>Estado</th>
-                <th>Fecha</th>
-                <th>Acción</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for ticket in tickets %}
-                <tr>
-                  <td style="font-weight: 700; color: var(--color-grey-400);">#{{ ticket.id }}</td>
-                  <td>
-                    <a href="{% url 'ticket_detail' ticket.id %}" class="ticket-link">
-                      {{ ticket.title }}
-                    </a>
-                  </td>
-                  <td>
-                    <div style="font-weight: 600; color: var(--color-white);">{{ ticket.created_by.get_full_name|default:ticket.created_by.username }}</div>
-                    <div style="font-size: 12px; color: var(--color-grey-500);">{{ ticket.created_by.email }}</div>
-                  </td>
-                  <td>{{ ticket.get_category_display }}</td>
-                  <td>
-                    <div class="priority-tag priority-{{ ticket.priority|lower }}">
-                      <span class="priority-dot"></span>
-                      <span>{{ ticket.get_priority_display }}</span>
-                    </div>
-                  </td>
-                  <td>
-                    {% if ticket.status == 'PENDIENTE' %}
-                      <span class="badge badge-pending">Pendiente</span>
-                    {% elif ticket.status == 'EN_PROCESO' %}
-                      <span class="badge badge-progress">En Proceso</span>
-                    {% elif ticket.status == 'RESUELTO' %}
-                      <span class="badge badge-resolved">Resuelto</span>
-                    {% else %}
-                      <span class="badge badge-closed">Cerrado</span>
-                    {% endif %}
-                  </td>
-                  <td style="font-size: 13px; color: var(--color-grey-500);">{{ ticket.created_at|date:"d/m/Y H:i" }}</td>
-                  <td>
-                    <a href="{% url 'ticket_detail' ticket.id %}" class="btn-azerta-secondary" style="padding: 6px 12px; font-size: 13px;">
-                      Gestionar
-                    </a>
-                  </td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      {% else %}
-        <div class="empty-state">
-          <div class="empty-state-icon">📋</div>
-          <p>No se encontraron tickets con el filtro seleccionado.</p>
-        </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      {% if is_admin %}<a href="{% url 'ticket_report' %}" class="btn-azerta-secondary">Estado semanal / mensual</a>{% endif %}
+      {% if is_ti %}
+        <a href="{% url 'dashboard' %}" class="btn-azerta-secondary">Todas las de TI</a>
+        <a href="{% url 'dashboard' %}?assigned=me" class="btn-azerta-secondary">Solo mis asignadas</a>
+        <a href="{% url 'ticket_report' %}" class="btn-azerta-secondary">Reportes</a>
       {% endif %}
     </div>
+  </div>
 
-  {% else %}
-    <!-- =======================================================
-         REGULAR USER VIEW: CREATE FORM + MY TICKETS
-         ======================================================= -->
-    <div class="user-layout-grid">
-      
-      <!-- Left Panel: Create Ticket Form -->
-      <div class="panel-card">
-        <h2 class="panel-title">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-primary);">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-          Nuevo Ticket de Soporte
-        </h2>
+  <div class="stats-grid">
+    <div class="stat-card stat-total"><span class="stat-label">Total del día</span><span class="stat-value">{{ stats.total }}</span></div>
+    <div class="stat-card stat-pending"><span class="stat-label">Pendientes</span><span class="stat-value">{{ stats.pending }}</span></div>
+    <div class="stat-card stat-progress"><span class="stat-label">En curso</span><span class="stat-value">{{ stats.in_progress }}</span></div>
+    <div class="stat-card stat-resolved"><span class="stat-label">Resueltas</span><span class="stat-value">{{ stats.resolved }}</span></div>
+  </div>
 
-        <form method="post" action="{% url 'dashboard' %}" class="login-form">
-          {% csrf_token %}
-
-          <div class="form-group">
-            <label for="id_ticket_title" class="azerta-label">Título / Asunto</label>
-            {{ form.title }}
+  {% if not user.onboarding_dismissed %}
+    <div class="role-guide-overlay">
+      <section class="role-guide" role="dialog" aria-modal="true" aria-label="Guía rápida para tu rol">
+        <div class="role-guide-header">
+          <div>
+            <span class="role-guide-kicker">Guía rápida</span>
+            <h2>{% if is_admin %}Panel de administración{% elif is_ti %}Centro de atención TI{% else %}Portal de soporte{% endif %}</h2>
           </div>
-
-          <div class="form-group">
-            <label for="id_ticket_category" class="azerta-label">Categoría</label>
-            {{ form.category }}
+          <div class="role-guide-header-actions">
+            <span class="role-guide-counter"><span id="guideCurrent">1</span> / <span id="guideTotal">5</span></span>
+            <button type="button" class="role-guide-close" id="closeRoleGuide" aria-label="Cerrar guía rápida" title="Cerrar guía rápida">&times;</button>
           </div>
-
-          <div class="form-group">
-            <label for="id_ticket_priority" class="azerta-label">Prioridad</label>
-            {{ form.priority }}
+        </div>
+        <div class="role-guide-track" id="roleGuideTrack">
+          {% if is_admin %}
+            <article class="role-guide-slide is-visible"><span class="role-guide-number">01</span><h3>Supervisa el día</h3><p>En el dashboard encontrarás únicamente las incidencias creadas durante la jornada actual. Revisa rápidamente cuántas están pendientes, cuáles se encuentran en curso y cuántas ya fueron resueltas.</p></article>
+            <article class="role-guide-slide"><span class="role-guide-number">02</span><h3>Organiza al equipo TI</h3><p>Desde la administración de usuarios puedes crear cuentas, asignar el rol TI y mantener activo o inactivo a cada integrante. También puedes ingresar incidencias manuales cuando el caso llegue por otro canal.</p></article>
+            <article class="role-guide-slide"><span class="role-guide-number">03</span><h3>Analiza resultados</h3><p>Los reportes semanales y mensuales te permiten comparar el volumen de solicitudes, sus estados y los tiempos de resolución. Úsalos para detectar acumulación de trabajo y oportunidades de mejora.</p></article>
+            <article class="role-guide-slide"><span class="role-guide-number">04</span><h3>Asigna sin perder control</h3><p>Puedes asignar una incidencia a un TI específico o dejar que el sistema la entregue automáticamente a un integrante disponible. En el detalle también puedes cambiar prioridad, estado y responsable.</p></article>
+            <article class="role-guide-slide"><span class="role-guide-number">05</span><h3>Conserva la trazabilidad</h3><p>Cada respuesta, cambio y responsable queda asociado a la incidencia. Así podrás reconstruir qué ocurrió, quién intervino y cuánto tiempo tomó resolver el caso.</p></article>
+          {% elif is_ti %}
+            <article class="role-guide-slide is-visible"><span class="role-guide-number">01</span><h3>Encuentra tu cola</h3><p>La cola TI reúne las solicitudes asignadas a los integrantes de soporte. Puedes revisar el trabajo de todo el equipo o usar “Solo mis asignadas” para concentrarte únicamente en las tareas que debes atender tú.</p></article>
+            <article class="role-guide-slide"><span class="role-guide-number">02</span><h3>Activa el cronómetro</h3><p>Cuando estés listo para trabajar, entra al detalle y pulsa “Comenzar tarea”. La incidencia pasará a estado “En curso” y el sistema comenzará a medir el tiempo de resolución en ese mismo momento.</p></article>
+            <article class="role-guide-slide"><span class="role-guide-number">03</span><h3>Deja trazabilidad</h3><p>Al actualizar una incidencia puedes cambiar su estado y escribir una respuesta. Cada mensaje queda guardado con tu nombre, fecha y hora para que el equipo tenga siempre el contexto de la atención.</p></article>
+            <article class="role-guide-slide"><span class="role-guide-number">04</span><h3>Coordínate con el equipo</h3><p>Los demás usuarios TI pueden ver qué tareas están en curso. Esto evita que dos personas trabajen sobre el mismo problema y facilita que el equipo se apoye cuando una incidencia necesita colaboración.</p></article>
+            <article class="role-guide-slide"><span class="role-guide-number">05</span><h3>Cierra con información</h3><p>Cuando termines, marca la incidencia como resuelta o cerrada y agrega una explicación clara de lo realizado. El tiempo final quedará registrado junto con tus respuestas para futuras consultas.</p></article>
+          {% else %}
+            <article class="role-guide-slide is-visible"><span class="role-guide-number">01</span><h3>Ingresa una solicitud</h3><p>Usa el formulario para explicar qué necesitas. Escribe un título claro, selecciona la categoría correcta, indica la prioridad y describe el problema con todos los datos que puedan ayudar al equipo TI.</p></article>
+            <article class="role-guide-slide"><span class="role-guide-number">02</span><h3>Seguimiento automático</h3><p>Al enviar la solicitud, el sistema la asignará a un TI disponible sin que tengas que escoger a una persona. Podrás ver quién la está atendiendo cuando comience el trabajo.</p></article>
+            <article class="role-guide-slide"><span class="role-guide-number">03</span><h3>Consulta el historial</h3><p>En “Mis solicitudes” puedes revisar tus casos del día y entrar al detalle de solicitudes anteriores. Allí encontrarás el estado, la prioridad, el responsable y el historial completo.</p></article>
+            <article class="role-guide-slide"><span class="role-guide-number">04</span><h3>Lee las actualizaciones</h3><p>Cada respuesta del equipo TI aparece con el nombre de quien la ingresó y la fecha y hora exactas. Revisa esta sección para saber qué acciones se realizaron o si se necesita información adicional.</p></article>
+            <article class="role-guide-slide"><span class="role-guide-number">05</span><h3>Recibe una solución</h3><p>Cuando TI termine, la solicitud cambiará a resuelta o cerrada. Podrás consultar la explicación final y el tiempo utilizado, manteniendo un registro de todo lo ocurrido.</p></article>
+          {% endif %}
+        </div>
+        <div class="role-guide-footer">
+          <div class="role-guide-navigation">
+            <button type="button" class="role-guide-nav" id="guidePrevious" aria-label="Diapositiva anterior" title="Anterior">&#8592;</button>
+            <div class="role-guide-dots" aria-hidden="true"><span class="is-active"></span><span></span><span></span><span></span><span></span></div>
+            <button type="button" class="role-guide-nav" id="guideNext" aria-label="Diapositiva siguiente" title="Siguiente">&#8594;</button>
           </div>
+          <form method="post" action="{% url 'dismiss_onboarding' %}">
+            {% csrf_token %}
+            <button type="submit" class="role-guide-dismiss">No volver a mostrar</button>
+          </form>
+        </div>
+      </section>
+    </div>
+    <script>document.body.classList.add('role-guide-open');</script>
+  {% endif %}
 
-          <div class="form-group">
-            <label for="id_ticket_description" class="azerta-label">Descripción</label>
-            {{ form.description }}
-          </div>
-
-          <button type="submit" class="btn-azerta-primary" id="btn-create-ticket">
-            <span>Enviar Requerimiento</span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="22" y1="2" x2="11" y2="13"></line>
-              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-            </svg>
-          </button>
-        </form>
-      </div>
-
-      <!-- Right Panel: User's Tickets -->
-      <div class="panel-card">
-        <h2 class="panel-title">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-primary);">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="16" y1="13" x2="8" y2="13"></line>
-            <line x1="16" y1="17" x2="8" y2="17"></line>
-            <polyline points="10 9 9 9 8 9"></polyline>
-          </svg>
-          Mis Solicitudes
-        </h2>
-
-        {% if tickets %}
-          <div class="table-responsive">
-            <table class="tickets-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Asunto</th>
-                  <th>Categoría</th>
-                  <th>Prioridad</th>
-                  <th>Estado</th>
-                  <th>Fecha</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for ticket in tickets %}
-                  <tr>
-                    <td style="font-weight: 700; color: var(--color-grey-400);">#{{ ticket.id }}</td>
-                    <td>
-                      <a href="{% url 'ticket_detail' ticket.id %}" class="ticket-link">
-                        {{ ticket.title }}
-                      </a>
-                    </td>
-                    <td>{{ ticket.get_category_display }}</td>
-                    <td>
-                      <div class="priority-tag priority-{{ ticket.priority|lower }}">
-                        <span class="priority-dot"></span>
-                        <span>{{ ticket.get_priority_display }}</span>
-                      </div>
-                    </td>
-                    <td>
-                      {% if ticket.status == 'PENDIENTE' %}
-                        <span class="badge badge-pending">Pendiente</span>
-                      {% elif ticket.status == 'EN_PROCESO' %}
-                        <span class="badge badge-progress">En Proceso</span>
-                      {% elif ticket.status == 'RESUELTO' %}
-                        <span class="badge badge-resolved">Resuelto</span>
-                      {% else %}
-                        <span class="badge badge-closed">Cerrado</span>
-                      {% endif %}
-                    </td>
-                    <td style="font-size: 13px; color: var(--color-grey-500);">{{ ticket.created_at|date:"d/m/Y H:i" }}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        {% else %}
-          <div class="empty-state">
-            <div class="empty-state-icon">✍️</div>
-            <h3 style="color: var(--color-white); margin-bottom: 6px;">Aún no tienes tickets registrados</h3>
-            <p>Utiliza el formulario de la izquierda para ingresar tu primera solicitud de soporte técnico.</p>
-          </div>
-        {% endif %}
-      </div>
-
+  {% if is_admin %}
+    <div class="panel-card new-report-panel" style="margin-bottom:24px;">
+      <h2 class="panel-title">Crear incidencia manual</h2>
+      <form method="post" class="login-form">
+        {% csrf_token %}
+        <div class="user-layout-grid">
+          <div><label class="azerta-label">Título</label>{{ admin_form.title }}</div>
+          <div><label class="azerta-label">Categoría</label>{{ admin_form.category }}</div>
+          <div><label class="azerta-label">Prioridad</label>{{ admin_form.priority }}</div>
+          <div><label class="azerta-label">Solicitante opcional</label>{{ admin_form.created_by }}</div>
+          <div><label class="azerta-label">Asignar a TI</label>{{ admin_form.assigned_to }}</div>
+          <div style="grid-column:1/-1;"><label class="azerta-label">Descripción</label>{{ admin_form.description }}</div>
+        </div>
+        <button type="submit" class="btn-azerta-primary">Crear incidencia</button>
+      </form>
+    </div>
+  {% elif not is_ti %}
+    <div class="panel-card new-report-panel" style="margin-bottom:24px;">
+      <h2 class="panel-title">Nuevo Ticket de Soporte</h2>
+      <form method="post" class="login-form">
+        {% csrf_token %}
+        <div class="form-group"><label class="azerta-label">Título</label>{{ form.title }}</div>
+        <div class="form-group"><label class="azerta-label">Categoría</label>{{ form.category }}</div>
+        <div class="form-group"><label class="azerta-label">Prioridad</label>{{ form.priority }}</div>
+        <div class="form-group"><label class="azerta-label">Descripción</label>{{ form.description }}</div>
+        <button type="submit" class="btn-azerta-primary">Enviar requerimiento</button>
+      </form>
     </div>
   {% endif %}
 
+  <div class="panel-card">
+    <h2 class="panel-title">{% if is_admin %}Incidencias del día{% elif is_ti %}Cola TI del día{% else %}Mis solicitudes de hoy{% endif %}</h2>
+    {% if is_ti %}
+      <div class="ti-ticket-grid">
+        {% for ticket in tickets %}
+          <article class="ti-ticket-card {% if ticket.status == 'EN_PROCESO' %}is-active{% endif %}">
+            <div class="ti-ticket-card-header">
+              <span class="ti-ticket-id">#{{ ticket.id }}</span>
+              {% if ticket.status == 'PENDIENTE' %}<span class="badge badge-pending">Pendiente</span>
+              {% elif ticket.status == 'EN_PROCESO' %}<span class="badge badge-progress">En curso</span>
+              {% elif ticket.status == 'RESUELTO' %}<span class="badge badge-resolved">Resuelto</span>
+              {% else %}<span class="badge badge-closed">Cerrado</span>{% endif %}
+            </div>
+            <h3 class="ti-ticket-title"><a href="{% url 'ticket_detail' ticket.id %}" class="ticket-link">{{ ticket.title }}</a></h3>
+            <p class="ti-ticket-description">{{ ticket.description|truncatechars:125 }}</p>
+            <div class="ti-ticket-meta">
+              <span><strong>Solicitante</strong>{% if ticket.created_by %}{{ ticket.created_by.get_full_name|default:ticket.created_by.username }}{% else %}Manual{% endif %}</span>
+              <span><strong>Responsable</strong>{% if ticket.assigned_to %}{{ ticket.assigned_to.get_full_name|default:ticket.assigned_to.username }}{% else %}Sin asignar{% endif %}</span>
+              <span><strong>Tiempo</strong><span class="live-timer" data-started-at="{{ ticket.started_at|date:'c' }}" data-resolved-at="{{ ticket.resolved_at|date:'c' }}">{% if ticket.resolution_duration %}{{ ticket.resolution_duration }}{% elif ticket.started_at %}En curso{% else %}No iniciado{% endif %}</span></span>
+            </div>
+            <a href="{% url 'ticket_detail' ticket.id %}" class="btn-azerta-secondary ti-ticket-action">Ver solicitud</a>
+          </article>
+        {% empty %}
+          <div class="empty-state"><p>No hay incidencias TI para mostrar hoy.</p></div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="table-responsive">
+        <table class="tickets-table">
+          <thead><tr><th>ID</th><th>Asunto</th><th>Solicitante</th><th>Asignado</th><th>Estado</th><th>Tiempo</th><th>Acción</th></tr></thead>
+          <tbody>
+            {% for ticket in tickets %}
+              <tr>
+                <td>#{{ ticket.id }}</td>
+                <td><a href="{% url 'ticket_detail' ticket.id %}" class="ticket-link">{{ ticket.title }}</a></td>
+                <td>{% if ticket.created_by %}{{ ticket.created_by.get_full_name|default:ticket.created_by.username }}{% else %}Manual{% endif %}</td>
+                <td>{% if ticket.assigned_to %}{{ ticket.assigned_to.get_full_name|default:ticket.assigned_to.username }}{% else %}Sin asignar{% endif %}</td>
+                <td>{% if ticket.status == 'PENDIENTE' %}<span class="badge badge-pending">Pendiente</span>{% elif ticket.status == 'EN_PROCESO' %}<span class="badge badge-progress">En curso</span>{% elif ticket.status == 'RESUELTO' %}<span class="badge badge-resolved">Resuelto</span>{% else %}<span class="badge badge-closed">Cerrado</span>{% endif %}</td>
+                <td>{% if ticket.resolution_duration %}{{ ticket.resolution_duration }}{% elif ticket.started_at %}En curso{% else %}-{% endif %}</td>
+                <td><a href="{% url 'ticket_detail' ticket.id %}" class="btn-azerta-secondary" style="padding:6px 12px; font-size:13px;">Ver</a></td>
+              </tr>
+            {% empty %}<tr><td colspan="7">No hay incidencias para mostrar hoy.</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+  </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function () {
+    function formatDuration(seconds) {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const remainder = seconds % 60;
+      return [hours, minutes, remainder].map(function (value) {
+        return String(value).padStart(2, '0');
+      }).join(':');
+    }
+
+    function updateTimers() {
+      document.querySelectorAll('.live-timer[data-started-at]').forEach(function (timer) {
+        const startedAt = Date.parse(timer.dataset.startedAt);
+        if (Number.isNaN(startedAt)) return;
+        const resolvedAt = timer.dataset.resolvedAt ? Date.parse(timer.dataset.resolvedAt) : Date.now();
+        if (Number.isNaN(resolvedAt)) return;
+        timer.textContent = formatDuration(Math.max(0, Math.floor((resolvedAt - startedAt) / 1000)));
+      });
+    }
+
+    updateTimers();
+    window.setInterval(updateTimers, 1000);
+
+    const guideSlides = document.querySelectorAll('.role-guide-slide');
+    const guideDots = document.querySelectorAll('.role-guide-dots span');
+    const guideCurrent = document.getElementById('guideCurrent');
+    const roleGuideOverlay = document.querySelector('.role-guide-overlay');
+    const closeRoleGuide = document.getElementById('closeRoleGuide');
+    const guidePrevious = document.getElementById('guidePrevious');
+    const guideNext = document.getElementById('guideNext');
+    const guideTotal = document.getElementById('guideTotal');
+    let guideIndex = 0;
+
+    if (guideTotal) guideTotal.textContent = guideSlides.length;
+
+    if (closeRoleGuide && roleGuideOverlay) {
+      closeRoleGuide.addEventListener('click', function () {
+        roleGuideOverlay.remove();
+        document.body.classList.remove('role-guide-open');
+      });
+    }
+
+    function showGuideSlide(index) {
+      guideSlides[guideIndex].classList.remove('is-visible');
+      guideDots[guideIndex].classList.remove('is-active');
+      guideIndex = (index + guideSlides.length) % guideSlides.length;
+      guideSlides[guideIndex].classList.add('is-visible');
+      guideDots[guideIndex].classList.add('is-active');
+      guideCurrent.textContent = guideIndex + 1;
+    }
+
+    if (guideSlides.length) {
+      guidePrevious.addEventListener('click', function () {
+        showGuideSlide(guideIndex - 1);
+      });
+      guideNext.addEventListener('click', function () {
+        showGuideSlide(guideIndex + 1);
+      });
+    }
+  }());
+</script>
 {% endblock %}

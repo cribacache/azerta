@@ -474,9 +474,10 @@ body {
 /* Stats Metrics Grid */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(4, 5cm);
   gap: 16px;
   margin-bottom: 32px;
+  justify-content: start;
 }
 
 .stat-card {
@@ -487,6 +488,15 @@ body {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  width: 5cm;
+  min-height: 5cm;
+  justify-content: center;
+}
+
+.new-report-panel {
+  width: 7cm;
+  max-width: 100%;
+  margin-left: auto;
 }
 
 .stat-card.stat-total { border-top: 3px solid var(--color-secondary); }
@@ -508,6 +518,220 @@ body {
   color: var(--color-white);
 }
 
+/* Role onboarding guide */
+.role-guide-open {
+  overflow: hidden;
+}
+
+.role-guide-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  z-index: 1100 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(3, 3, 11, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: guide-overlay-in 0.35s ease both;
+}
+
+.role-guide {
+  position: relative;
+  overflow: hidden;
+  width: min(680px, 100%);
+  margin-bottom: 0;
+  padding: 24px 28px 20px;
+  background: linear-gradient(115deg, rgba(55, 145, 195, 0.16), rgba(255, 0, 102, 0.1));
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 10px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.24);
+  animation: guide-modal-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes guide-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes guide-modal-in {
+  from { opacity: 0; transform: translateY(18px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.role-guide-header,
+.role-guide-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.role-guide-navigation {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.role-guide-nav {
+  display: inline-grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  color: var(--color-grey-300);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.role-guide-nav:hover,
+.role-guide-nav:focus-visible {
+  color: var(--color-white);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+.role-guide-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.role-guide-close {
+  display: inline-grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  color: var(--color-grey-400);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 50%;
+  cursor: pointer;
+  font: inherit;
+  font-size: 23px;
+  line-height: 1;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.role-guide-close:hover,
+.role-guide-close:focus-visible {
+  color: var(--color-white);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+.role-guide-kicker {
+  color: var(--color-primary-hover);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.role-guide h2 {
+  margin-top: 3px;
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.role-guide-counter {
+  color: var(--color-grey-400);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.role-guide-track {
+  position: relative;
+  min-height: 210px;
+  margin: 18px 0 10px;
+}
+
+.role-guide-slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  opacity: 0;
+  transform: translateX(18px);
+  pointer-events: none;
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+
+.role-guide-slide.is-visible {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.role-guide-number {
+  color: var(--color-grey-600);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.role-guide-slide h3 {
+  margin: 3px 0 4px;
+  font-size: 22px;
+}
+
+.role-guide-slide p {
+  max-width: 680px;
+  color: var(--color-grey-300);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.role-guide-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+  padding-top: 14px;
+}
+
+.role-guide-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.role-guide-dots span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  transition: width 0.25s ease, background 0.25s ease;
+}
+
+.role-guide-dots span.is-active {
+  width: 22px;
+  border-radius: 5px;
+  background: var(--color-primary);
+}
+
+.role-guide-dismiss {
+  padding: 7px 0;
+  color: var(--color-grey-400);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  text-decoration: underline;
+}
+
+.role-guide-dismiss:hover {
+  color: var(--color-white);
+}
+
 /* Layout Split: Regular User (Form + List) */
 .user-layout-grid {
   display: grid;
@@ -517,6 +741,10 @@ body {
 }
 
 @media (max-width: 960px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 5cm);
+  }
+
   .user-layout-grid {
     grid-template-columns: 1fr;
   }
@@ -537,6 +765,176 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+/* TI queue cards */
+.ti-ticket-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 5cm);
+  gap: 16px;
+  justify-content: start;
+}
+
+.ti-ticket-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 5cm;
+  height: 5cm;
+  min-height: 5cm;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 3px solid var(--color-secondary);
+  border-radius: 8px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+  text-align: center;
+  transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+
+.ti-ticket-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.ti-ticket-card.is-active {
+  border-top-color: var(--color-primary);
+  box-shadow: inset 3px 0 16px rgba(255, 0, 102, 0.08);
+}
+
+.ti-ticket-card-header,
+.ti-ticket-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ti-ticket-card-header {
+  justify-content: center;
+}
+
+.ti-ticket-id {
+  color: var(--color-grey-500);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ti-ticket-title {
+  min-height: 34px;
+  max-height: 38px;
+  overflow: hidden;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.ti-ticket-description {
+  min-height: 30px;
+  max-height: 32px;
+  overflow: hidden;
+  color: var(--color-grey-500);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.ti-ticket-meta {
+  align-items: flex-start;
+  flex-direction: column;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--color-grey-300);
+  font-size: 11px;
+}
+
+.ti-ticket-meta span {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 12px;
+}
+
+.ti-ticket-meta strong {
+  color: var(--color-grey-600);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ti-ticket-action {
+  align-self: center;
+  margin-top: auto;
+  padding: 5px 9px;
+  font-size: 11px;
+}
+
+.ticket-section-title {
+  margin: 28px 0 14px;
+  color: var(--color-grey-300);
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.ticket-response {
+  padding: 16px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ticket-response-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 6px;
+  color: var(--color-grey-300);
+  font-size: 13px;
+}
+
+.ticket-response-header time {
+  color: var(--color-grey-600);
+  font-size: 12px;
+}
+
+.ticket-response p {
+  color: var(--color-grey-100);
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+@media (max-width: 520px) {
+  .role-guide-overlay {
+    padding: 16px;
+  }
+
+  .role-guide {
+    padding: 22px 20px 18px;
+  }
+
+  .role-guide-track {
+    min-height: 290px;
+  }
+
+  .ti-ticket-card {
+    aspect-ratio: auto;
+    width: 5cm;
+    height: 5cm;
+    min-height: 5cm;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stat-card {
+    width: 100%;
+  }
+
+  .ticket-response-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
 }
 
 /* Status Filter Tabs */

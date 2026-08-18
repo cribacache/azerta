@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Administrar Usuarios | Azerta{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: end; gap: 16px; flex-wrap: wrap;">
+    <div>
+      <h1 class="dashboard-title">Administrar usuarios</h1>
+      <p class="dashboard-subtitle">Cada usuario conserva el historial de sus solicitudes de soporte.</p>
+    </div>
+    <a href="{% url 'user_create' %}" class="btn-azerta-primary">Nuevo usuario</a>
+  </div>
+
+  <div class="panel-card">
+    <div class="table-responsive">
+      <table class="tickets-table">
+        <thead>
+          <tr>
+            <th>Usuario / RUT</th>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Solicitudes</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for account in users %}
+            <tr>
+              <td>
+                <strong>{{ account.username }}</strong>
+                {% if account.rut %}<div style="font-size: 12px; color: var(--color-grey-500);">RUT: {{ account.rut }}</div>{% endif %}
+              </td>
+              <td>{{ account.get_full_name|default:"Sin nombre" }}</td>
+              <td>{{ account.email|default:"-" }}</td>
+              <td>{{ account.tickets.all|length }}</td>
+              <td>
+                {% if account.is_active %}<span class="badge badge-resolved">Activo</span>{% else %}<span class="badge badge-closed">Inactivo</span>{% endif %}
+              </td>
+              <td style="white-space: nowrap;">
+                <a href="{% url 'user_update' account.pk %}" class="btn-azerta-secondary" style="padding: 6px 12px; font-size: 13px;">Editar / historial</a>
+                {% if account != user %}
+                  <form method="post" action="{% url 'user_delete' account.pk %}" style="display: inline;" onsubmit="return confirm('{% if account.tickets.all %}¿Desactivar este usuario para conservar su historial?{% else %}¿Eliminar este usuario?{% endif %}');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-azerta-secondary" style="padding: 6px 12px; font-size: 13px;">{% if account.tickets.all %}Desactivar{% else %}Eliminar{% endif %}</button>
+                  </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6">No hay usuarios registrados.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
