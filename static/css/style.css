@@ -471,6 +471,13 @@ body {
   color: var(--color-grey-500);
 }
 
+.dashboard-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 /* Stats Metrics Grid */
 .stats-grid {
   display: grid;
@@ -497,6 +504,80 @@ body {
   width: 7cm;
   max-width: 100%;
   margin-left: auto;
+}
+
+.dashboard-action-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 24px;
+}
+
+.report-modal-open {
+  overflow: hidden;
+}
+
+.report-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(3, 3, 11, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.report-modal-overlay.is-open {
+  display: flex;
+  animation: guide-overlay-in 0.25s ease both;
+}
+
+.report-modal {
+  width: min(680px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding: 26px 28px;
+  background: var(--color-brand-navy);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.45);
+  animation: guide-modal-in 0.3s ease both;
+}
+
+.report-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.report-modal-header h2 {
+  margin-top: 4px;
+  font-size: 22px;
+}
+
+.manual-report-panel {
+  margin-bottom: 24px;
+}
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.admin-form-wide {
+  grid-column: 1 / -1;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .stat-card.stat-total { border-top: 3px solid var(--color-secondary); }
@@ -745,6 +826,10 @@ body {
     grid-template-columns: repeat(2, 5cm);
   }
 
+  .admin-form-grid {
+    grid-template-columns: 1fr;
+  }
+
   .user-layout-grid {
     grid-template-columns: 1fr;
   }
@@ -911,6 +996,14 @@ body {
     padding: 22px 20px 18px;
   }
 
+  .report-modal-overlay {
+    padding: 14px;
+  }
+
+  .report-modal {
+    padding: 22px 18px;
+  }
+
   .role-guide-track {
     min-height: 290px;
   }
@@ -998,6 +1091,30 @@ body {
 
 .tickets-table tr:hover td {
   background: rgba(255, 255, 255, 0.02);
+}
+
+.ticket-table-action {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.table-secondary-text {
+  margin-top: 2px;
+  color: var(--color-grey-500);
+  font-size: 12px;
+}
+
+.table-actions {
+  white-space: nowrap;
+}
+
+.inline-action-form {
+  display: inline;
+}
+
+.table-action-button {
+  padding: 6px 12px;
+  font-size: 13px;
 }
 
 .ticket-link {

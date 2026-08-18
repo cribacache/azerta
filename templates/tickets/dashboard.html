@@ -4,12 +4,12 @@
 
 {% block content %}
 <div class="dashboard-container">
-  <div class="dashboard-header" style="display:flex; justify-content:space-between; align-items:end; gap:16px; flex-wrap:wrap;">
+  <div class="dashboard-header">
     <div>
       <h1 class="dashboard-title">Dashboard diario</h1>
       <p class="dashboard-subtitle">Incidencias del {{ today|date:"d/m/Y" }}.</p>
     </div>
-    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+    <div class="dashboard-actions">
       {% if is_admin %}<a href="{% url 'ticket_report' %}" class="btn-azerta-secondary">Estado semanal / mensual</a>{% endif %}
       {% if is_ti %}
         <a href="{% url 'dashboard' %}" class="btn-azerta-secondary">Todas las de TI</a>
@@ -77,32 +77,49 @@
   {% endif %}
 
   {% if is_admin %}
-    <div class="panel-card new-report-panel" style="margin-bottom:24px;">
-      <h2 class="panel-title">Crear incidencia manual</h2>
-      <form method="post" class="login-form">
-        {% csrf_token %}
-        <div class="user-layout-grid">
-          <div><label class="azerta-label">Título</label>{{ admin_form.title }}</div>
-          <div><label class="azerta-label">Categoría</label>{{ admin_form.category }}</div>
-          <div><label class="azerta-label">Prioridad</label>{{ admin_form.priority }}</div>
-          <div><label class="azerta-label">Solicitante opcional</label>{{ admin_form.created_by }}</div>
-          <div><label class="azerta-label">Asignar a TI</label>{{ admin_form.assigned_to }}</div>
-          <div style="grid-column:1/-1;"><label class="azerta-label">Descripción</label>{{ admin_form.description }}</div>
-        </div>
-        <button type="submit" class="btn-azerta-primary">Crear incidencia</button>
-      </form>
+    <div class="dashboard-action-row">
+      <button type="button" class="btn-azerta-primary" id="openReportModal">Crear incidencia manual</button>
     </div>
   {% elif not is_ti %}
-    <div class="panel-card new-report-panel" style="margin-bottom:24px;">
-      <h2 class="panel-title">Nuevo Ticket de Soporte</h2>
-      <form method="post" class="login-form">
-        {% csrf_token %}
-        <div class="form-group"><label class="azerta-label">Título</label>{{ form.title }}</div>
-        <div class="form-group"><label class="azerta-label">Categoría</label>{{ form.category }}</div>
-        <div class="form-group"><label class="azerta-label">Prioridad</label>{{ form.priority }}</div>
-        <div class="form-group"><label class="azerta-label">Descripción</label>{{ form.description }}</div>
-        <button type="submit" class="btn-azerta-primary">Enviar requerimiento</button>
-      </form>
+    <div class="dashboard-action-row">
+      <button type="button" class="btn-azerta-primary" id="openReportModal">Nuevo Ticket de Soporte</button>
+    </div>
+  {% endif %}
+
+  {% if is_admin or not is_ti %}
+    <div class="report-modal-overlay" id="reportModal" aria-hidden="true">
+      <section class="report-modal" role="dialog" aria-modal="true" aria-labelledby="reportModalTitle">
+        <div class="report-modal-header">
+          <div>
+            <span class="role-guide-kicker">Mesa de Soporte</span>
+            <h2 id="reportModalTitle">{% if is_admin %}Crear incidencia manual{% else %}Nuevo Ticket de Soporte{% endif %}</h2>
+          </div>
+          <button type="button" class="role-guide-close" id="closeReportModal" aria-label="Cerrar formulario">&times;</button>
+        </div>
+        {% if is_admin %}
+          <form method="post" class="login-form">
+            {% csrf_token %}
+            <div class="admin-form-grid">
+              <div><label class="azerta-label">Título</label>{{ admin_form.title }}</div>
+              <div><label class="azerta-label">Categoría</label>{{ admin_form.category }}</div>
+              <div><label class="azerta-label">Prioridad</label>{{ admin_form.priority }}</div>
+              <div><label class="azerta-label">Solicitante opcional</label>{{ admin_form.created_by }}</div>
+              <div><label class="azerta-label">Asignar a TI</label>{{ admin_form.assigned_to }}</div>
+              <div class="admin-form-wide"><label class="azerta-label">Descripción</label>{{ admin_form.description }}</div>
+            </div>
+            <div class="form-actions"><button type="submit" class="btn-azerta-primary">Crear incidencia</button><button type="button" class="btn-azerta-secondary" id="cancelReportModal">Cancelar</button></div>
+          </form>
+        {% else %}
+          <form method="post" class="login-form">
+            {% csrf_token %}
+            <div class="form-group"><label class="azerta-label">Título</label>{{ form.title }}</div>
+            <div class="form-group"><label class="azerta-label">Categoría</label>{{ form.category }}</div>
+            <div class="form-group"><label class="azerta-label">Prioridad</label>{{ form.priority }}</div>
+            <div class="form-group"><label class="azerta-label">Descripción</label>{{ form.description }}</div>
+            <div class="form-actions"><button type="submit" class="btn-azerta-primary">Enviar requerimiento</button><button type="button" class="btn-azerta-secondary" id="cancelReportModal">Cancelar</button></div>
+          </form>
+        {% endif %}
+      </section>
     </div>
   {% endif %}
 
@@ -145,7 +162,7 @@
                 <td>{% if ticket.assigned_to %}{{ ticket.assigned_to.get_full_name|default:ticket.assigned_to.username }}{% else %}Sin asignar{% endif %}</td>
                 <td>{% if ticket.status == 'PENDIENTE' %}<span class="badge badge-pending">Pendiente</span>{% elif ticket.status == 'EN_PROCESO' %}<span class="badge badge-progress">En curso</span>{% elif ticket.status == 'RESUELTO' %}<span class="badge badge-resolved">Resuelto</span>{% else %}<span class="badge badge-closed">Cerrado</span>{% endif %}</td>
                 <td>{% if ticket.resolution_duration %}{{ ticket.resolution_duration }}{% elif ticket.started_at %}En curso{% else %}-{% endif %}</td>
-                <td><a href="{% url 'ticket_detail' ticket.id %}" class="btn-azerta-secondary" style="padding:6px 12px; font-size:13px;">Ver</a></td>
+                <td><a href="{% url 'ticket_detail' ticket.id %}" class="btn-azerta-secondary ticket-table-action">Ver</a></td>
               </tr>
             {% empty %}<tr><td colspan="7">No hay incidencias para mostrar hoy.</td></tr>{% endfor %}
           </tbody>
@@ -216,6 +233,28 @@
       guideNext.addEventListener('click', function () {
         showGuideSlide(guideIndex + 1);
       });
+    }
+
+    const reportModal = document.getElementById('reportModal');
+    const openReportModal = document.getElementById('openReportModal');
+    const closeReportModal = document.getElementById('closeReportModal');
+    const cancelReportModal = document.getElementById('cancelReportModal');
+
+    function closeReportDialog() {
+      if (!reportModal) return;
+      reportModal.classList.remove('is-open');
+      reportModal.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('report-modal-open');
+    }
+
+    if (openReportModal && reportModal) {
+      openReportModal.addEventListener('click', function () {
+        reportModal.classList.add('is-open');
+        reportModal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('report-modal-open');
+      });
+      closeReportModal.addEventListener('click', closeReportDialog);
+      cancelReportModal.addEventListener('click', closeReportDialog);
     }
   }());
 </script>
