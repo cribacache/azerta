@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Contactos de emergencia | Azerta{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <div>
+      <h1 class="dashboard-title">Contactos de emergencia</h1>
+      <p class="dashboard-subtitle">Números y responsables de contacto para situaciones prioritarias.</p>
+    </div>
+  </div>
+
+  <div class="panel-card">
+    <div class="contacts-grid">
+      {% for contact in contacts %}
+        <article class="contact-card">
+          <span class="contact-kicker">{{ contact.name }}</span>
+          <h3>{{ contact.person }}</h3>
+          <a class="contact-phone" href="tel:{{ contact.phone|cut:' ' }}">{{ contact.phone }}</a>
+          {% if contact.email %}
+            <a class="contact-email" href="mailto:{{ contact.email }}">{{ contact.email }}</a>
+          {% endif %}
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

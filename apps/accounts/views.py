@@ -68,8 +68,11 @@ def user_create(request):
     form = UserCreateForm(request.POST or None)
     if request.method == 'POST' and form.is_valid():
         user = form.save()
-        password = build_initial_password(user.first_name, user.rut)
-        messages.success(request, f'Usuario creado. Contraseña inicial: {password}')
+        password = build_initial_password(user.first_name, user.last_name, user.date_joined.year)
+        messages.success(
+            request,
+            f'Usuario creado. ID asignado: {user.username}. Contraseña inicial: {password}. Formato: primera letra del nombre + primera letra del apellido + * + año de creación (ejemplo: AP*{user.date_joined.year}).'
+        )
         return redirect('user_list')
     return render(request, 'accounts/user_form.html', {'form': form, 'page_title': 'Nuevo usuario'})
 
@@ -81,8 +84,11 @@ def user_update(request, pk):
     if request.method == 'POST' and form.is_valid():
         updated_user = form.save()
         if form.cleaned_data.get('reset_password'):
-            password = build_initial_password(updated_user.first_name, updated_user.rut)
-            messages.success(request, f'Usuario actualizado. Nueva contraseña: {password}')
+            password = build_initial_password(updated_user.first_name, updated_user.last_name, updated_user.date_joined.year)
+            messages.success(
+                request,
+                f'Usuario actualizado. Nueva contraseña: {password}. Formato: primera letra del nombre + primera letra del apellido + * + año de creación.'
+            )
         else:
             messages.success(request, 'Usuario actualizado correctamente.')
         return redirect('user_list')
@@ -100,6 +106,10 @@ def user_delete(request, pk):
         return redirect('user_list')
     if user == request.user:
         messages.error(request, 'No puedes eliminar tu propio usuario.')
+    elif not user.is_active:
+        user.is_active = True
+        user.save(update_fields=['is_active'])
+        messages.success(request, 'Usuario activado correctamente.')
     elif user.tickets.exists():
         user.is_active = False
         user.save(update_fields=['is_active'])

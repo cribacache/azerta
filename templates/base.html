@@ -42,9 +42,12 @@
           {% if user.role == 'ADMIN' or user.is_superuser %}
             <a href="{% url 'ticket_report' %}" class="nav-link">Reportes</a>
             <a href="{% url 'user_list' %}" class="nav-link">Usuarios</a>
+            <a href="{% url 'emergency_contacts' %}" class="nav-link">Contactos de emergencia</a>
             <a href="/admin/" target="_blank" rel="noopener" class="nav-link">Admin Django</a>
           {% elif user.role == 'TI' %}
-            <a href="{% url 'ticket_report' %}" class="nav-link">Reportes</a>
+            <a href="{% url 'emergency_contacts' %}" class="nav-link">Contactos de emergencia</a>
+          {% else %}
+            <a href="{% url 'emergency_contacts' %}" class="nav-link">Contactos de emergencia</a>
           {% endif %}
           <div class="user-badge">
             <span style="font-weight: 700;">{{ user.username }}</span>

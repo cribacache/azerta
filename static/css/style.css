@@ -703,6 +703,11 @@ body {
   transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 }
 
+.role-guide-close[hidden],
+.role-guide-dismiss[hidden] {
+  display: none !important;
+}
+
 .role-guide-close:hover,
 .role-guide-close:focus-visible {
   color: var(--color-white);
@@ -811,6 +816,227 @@ body {
 
 .role-guide-dismiss:hover {
   color: var(--color-white);
+}
+
+.contacts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.contact-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.contact-kicker {
+  color: var(--color-primary-hover);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.contact-card h3 {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.contact-phone {
+  color: var(--color-grey-300);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.contact-email {
+  color: var(--color-primary-hover);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.room-check-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+.room-check-grid-modal {
+  max-height: calc(70vh - 110px);
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.room-check-grid-dashboard {
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.room-check-dashboard-section {
+  margin-bottom: 24px;
+}
+
+.section-heading-row,
+.room-summary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.section-heading-row {
+  margin-bottom: 14px;
+}
+
+.room-check-date,
+.room-summary-reviewer {
+  color: var(--color-grey-400);
+  font-size: 13px;
+}
+
+.room-summary-header h3 {
+  font-size: 20px;
+}
+
+.room-check-summary-card {
+  min-height: 164px;
+}
+
+.room-summary-button {
+  width: 100%;
+  margin-top: auto;
+  padding: 10px 12px;
+  font-size: 12px;
+}
+
+.room-check-grid-modal .room-check-detail {
+  display: none;
+}
+
+.room-check-grid-modal .room-check-detail.is-selected {
+  display: flex;
+}
+
+.room-check-modal {
+  width: min(980px, 100%);
+}
+
+.room-check-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.reviewed-by-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--color-grey-300);
+  font-size: 13px;
+}
+
+.room-status-badge {
+  align-self: flex-start;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.status-green {
+  background: rgba(16, 185, 129, 0.16);
+  color: #8ef0bf;
+}
+
+.status-red {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ff9a9a;
+}
+
+.room-check-card h3 {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.check-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--color-grey-300);
+  font-size: 14px;
+}
+
+.check-list li {
+  position: relative;
+  padding-left: 16px;
+}
+
+.check-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--color-primary);
+}
+
+.check-list li.is-checked {
+  color: #9ae6b4;
+}
+
+.check-list li.is-unchecked {
+  color: #fca5a5;
+}
+
+.room-check-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.room-check-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-grey-200);
+}
+
+.room-check-checkboxes label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.room-check-button {
+  border: none;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-weight: 800;
+  font-size: 14px;
+  color: white;
+  cursor: pointer;
+  margin-top: auto;
+}
+
+.room-check-button.is-green {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.room-check-button.is-red {
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
 }
 
 /* Layout Split: Regular User (Form + List) */
@@ -1113,8 +1339,16 @@ body {
 }
 
 .table-action-button {
-  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 110px;
+  min-height: 38px;
+  padding: 8px 14px;
   font-size: 13px;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .ticket-link {

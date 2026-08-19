@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from apps.tickets.models import Ticket
 
-from .forms import build_initial_password
+from .forms import build_initial_password, build_username
 
 
 class AzertaAuthTests(TestCase):
@@ -56,21 +56,28 @@ class AzertaAuthTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(response.context['user'].is_authenticated)
 
-    def test_staff_can_create_user_with_rut_login_and_initial_password(self):
+    def test_staff_can_create_user_without_rut_and_initial_password(self):
         self.client.login(username='azerta_user', password='SecurePassword123!')
         self.user.is_staff = True
         self.user.save(update_fields=['is_staff'])
         response = self.client.post(reverse('user_create'), {
-            'rut': '12.345.678-5',
             'first_name': 'Ana',
             'last_name': 'Pérez',
             'email': 'ana@azerta.cl',
             'is_active': True,
         }, follow=True)
         self.assertEqual(response.status_code, 200)
-        created = self.User.objects.get(rut='12345678')
-        self.assertEqual(created.username, '12345678')
-        self.assertTrue(created.check_password(build_initial_password('Ana', '12345678')))
+        created = self.User.objects.filter(email='ana@azerta.cl').latest('id')
+        self.assertEqual(created.username, 'aperez')
+        self.assertTrue(created.check_password(build_initial_password('Ana', 'Pérez', created.date_joined.year)))
+
+    def test_password_format_uses_initials_and_creation_year(self):
+        self.assertEqual(build_initial_password('Ana', 'Pérez', 2026), 'AP*2026')
+        self.assertEqual(build_initial_password('Juan', 'Carlos', 2024), 'JC*2024')
+
+    def test_username_uses_first_letter_and_full_last_name(self):
+        self.assertEqual(build_username('Ana', 'Pérez'), 'aperez')
+        self.assertEqual(build_username('Juan', 'Carlos'), 'jcarlos')
 
     def test_regular_user_cannot_access_user_management(self):
         self.client.login(username='azerta_user', password='SecurePassword123!')

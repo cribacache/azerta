@@ -14,7 +14,6 @@
       {% if is_ti %}
         <a href="{% url 'dashboard' %}" class="btn-azerta-secondary">Todas las de TI</a>
         <a href="{% url 'dashboard' %}?assigned=me" class="btn-azerta-secondary">Solo mis asignadas</a>
-        <a href="{% url 'ticket_report' %}" class="btn-azerta-secondary">Reportes</a>
       {% endif %}
     </div>
   </div>
@@ -36,28 +35,28 @@
           </div>
           <div class="role-guide-header-actions">
             <span class="role-guide-counter"><span id="guideCurrent">1</span> / <span id="guideTotal">5</span></span>
-            <button type="button" class="role-guide-close" id="closeRoleGuide" aria-label="Cerrar guía rápida" title="Cerrar guía rápida">&times;</button>
+            <button type="button" class="role-guide-close" id="closeRoleGuide" aria-label="Cerrar guía rápida" title="Cerrar guía rápida" hidden>&times;</button>
           </div>
         </div>
         <div class="role-guide-track" id="roleGuideTrack">
           {% if is_admin %}
-            <article class="role-guide-slide is-visible"><span class="role-guide-number">01</span><h3>Supervisa el día</h3><p>En el dashboard encontrarás únicamente las incidencias creadas durante la jornada actual. Revisa rápidamente cuántas están pendientes, cuáles se encuentran en curso y cuántas ya fueron resueltas.</p></article>
-            <article class="role-guide-slide"><span class="role-guide-number">02</span><h3>Organiza al equipo TI</h3><p>Desde la administración de usuarios puedes crear cuentas, asignar el rol TI y mantener activo o inactivo a cada integrante. También puedes ingresar incidencias manuales cuando el caso llegue por otro canal.</p></article>
-            <article class="role-guide-slide"><span class="role-guide-number">03</span><h3>Analiza resultados</h3><p>Los reportes semanales y mensuales te permiten comparar el volumen de solicitudes, sus estados y los tiempos de resolución. Úsalos para detectar acumulación de trabajo y oportunidades de mejora.</p></article>
-            <article class="role-guide-slide"><span class="role-guide-number">04</span><h3>Asigna sin perder control</h3><p>Puedes asignar una incidencia a un TI específico o dejar que el sistema la entregue automáticamente a un integrante disponible. En el detalle también puedes cambiar prioridad, estado y responsable.</p></article>
-            <article class="role-guide-slide"><span class="role-guide-number">05</span><h3>Conserva la trazabilidad</h3><p>Cada respuesta, cambio y responsable queda asociado a la incidencia. Así podrás reconstruir qué ocurrió, quién intervino y cuánto tiempo tomó resolver el caso.</p></article>
+            <article class="role-guide-slide is-visible"><span class="role-guide-number">01</span><h3>Supervisa el día</h3><p>En el dashboard encontrarás las incidencias de la jornada, sus estados y sus tiempos. Usa los indicadores para identificar rápidamente lo pendiente, lo que está en curso y lo ya resuelto.</p></article>
+            <article class="role-guide-slide"><span class="role-guide-number">02</span><h3>Administra usuarios</h3><p>Crea, edita, activa o desactiva cuentas desde Usuarios. Ya no se solicita RUT: el sistema genera el nombre de usuario en minúsculas con la inicial del nombre y el apellido completo, sin caracteres especiales.</p></article>
+            <article class="role-guide-slide"><span class="role-guide-number">03</span><h3>Gestiona credenciales</h3><p>Las nuevas contraseñas se generan con la inicial del nombre, la inicial del apellido, un asterisco y el año de creación de la cuenta. El acceso se realiza con nombre de usuario, no con RUT.</p></article>
+            <article class="role-guide-slide"><span class="role-guide-number">04</span><h3>Revisa salas y contactos</h3><p>Desde el dashboard puedes consultar las salas y abrir el detalle de una sala para registrar sus checks. En Contactos de emergencia encontrarás teléfonos y correos de apoyo.</p></article>
+            <article class="role-guide-slide"><span class="role-guide-number">05</span><h3>Analiza resultados</h3><p>Los reportes semanales y mensuales están disponibles para administración. Úsalos junto con el historial de incidencias para revisar estados, tiempos de resolución y carga de trabajo.</p></article>
           {% elif is_ti %}
-            <article class="role-guide-slide is-visible"><span class="role-guide-number">01</span><h3>Encuentra tu cola</h3><p>La cola TI reúne las solicitudes asignadas a los integrantes de soporte. Puedes revisar el trabajo de todo el equipo o usar “Solo mis asignadas” para concentrarte únicamente en las tareas que debes atender tú.</p></article>
-            <article class="role-guide-slide"><span class="role-guide-number">02</span><h3>Activa el cronómetro</h3><p>Cuando estés listo para trabajar, entra al detalle y pulsa “Comenzar tarea”. La incidencia pasará a estado “En curso” y el sistema comenzará a medir el tiempo de resolución en ese mismo momento.</p></article>
-            <article class="role-guide-slide"><span class="role-guide-number">03</span><h3>Deja trazabilidad</h3><p>Al actualizar una incidencia puedes cambiar su estado y escribir una respuesta. Cada mensaje queda guardado con tu nombre, fecha y hora para que el equipo tenga siempre el contexto de la atención.</p></article>
-            <article class="role-guide-slide"><span class="role-guide-number">04</span><h3>Coordínate con el equipo</h3><p>Los demás usuarios TI pueden ver qué tareas están en curso. Esto evita que dos personas trabajen sobre el mismo problema y facilita que el equipo se apoye cuando una incidencia necesita colaboración.</p></article>
-            <article class="role-guide-slide"><span class="role-guide-number">05</span><h3>Cierra con información</h3><p>Cuando termines, marca la incidencia como resuelta o cerrada y agrega una explicación clara de lo realizado. El tiempo final quedará registrado junto con tus respuestas para futuras consultas.</p></article>
+            <article class="role-guide-slide is-visible"><span class="role-guide-number">01</span><h3>Encuentra tu cola</h3><p>La cola TI reúne las solicitudes asignadas al equipo. Puedes revisar todas las de TI o usar “Solo mis asignadas” para concentrarte en las tareas que debes atender tú.</p></article>
+            <article class="role-guide-slide"><span class="role-guide-number">02</span><h3>Agrega incidencias manuales</h3><p>Si recibes un caso por otro canal, usa “Agregar incidencia manual”. Completa el título, categoría, prioridad, descripción y, si corresponde, el solicitante y responsable.</p></article>
+            <article class="role-guide-slide"><span class="role-guide-number">03</span><h3>Revisa una sala</h3><p>Las salas aparecen directamente en tu dashboard. Pulsa el estado de una sala para abrir solo su popup, selecciona los checks realizados y guarda la revisión del día.</p></article>
+            <article class="role-guide-slide"><span class="role-guide-number">04</span><h3>Consulta apoyos</h3><p>En Contactos de emergencia tienes teléfonos y correos de administración, operaciones y climatización. Los reportes están reservados para administración.</p></article>
+            <article class="role-guide-slide"><span class="role-guide-number">05</span><h3>Cierra con información</h3><p>Al actualizar una incidencia puedes cambiar su estado y dejar una respuesta. Cada acción queda registrada con tu nombre, fecha y hora para conservar el contexto de la atención.</p></article>
           {% else %}
-            <article class="role-guide-slide is-visible"><span class="role-guide-number">01</span><h3>Ingresa una solicitud</h3><p>Usa el formulario para explicar qué necesitas. Escribe un título claro, selecciona la categoría correcta, indica la prioridad y describe el problema con todos los datos que puedan ayudar al equipo TI.</p></article>
-            <article class="role-guide-slide"><span class="role-guide-number">02</span><h3>Seguimiento automático</h3><p>Al enviar la solicitud, el sistema la asignará a un TI disponible sin que tengas que escoger a una persona. Podrás ver quién la está atendiendo cuando comience el trabajo.</p></article>
-            <article class="role-guide-slide"><span class="role-guide-number">03</span><h3>Consulta el historial</h3><p>En “Mis solicitudes” puedes revisar tus casos del día y entrar al detalle de solicitudes anteriores. Allí encontrarás el estado, la prioridad, el responsable y el historial completo.</p></article>
-            <article class="role-guide-slide"><span class="role-guide-number">04</span><h3>Lee las actualizaciones</h3><p>Cada respuesta del equipo TI aparece con el nombre de quien la ingresó y la fecha y hora exactas. Revisa esta sección para saber qué acciones se realizaron o si se necesita información adicional.</p></article>
-            <article class="role-guide-slide"><span class="role-guide-number">05</span><h3>Recibe una solución</h3><p>Cuando TI termine, la solicitud cambiará a resuelta o cerrada. Podrás consultar la explicación final y el tiempo utilizado, manteniendo un registro de todo lo ocurrido.</p></article>
+            <article class="role-guide-slide is-visible"><span class="role-guide-number">01</span><h3>Ingresa una solicitud</h3><p>Usa el formulario para explicar qué necesitas. Escribe un título claro, selecciona la categoría, indica la prioridad y describe el problema con los datos que ayuden al equipo TI.</p></article>
+            <article class="role-guide-slide"><span class="role-guide-number">02</span><h3>Seguimiento automático</h3><p>Al enviar la solicitud, el sistema la asignará a un TI disponible. Podrás ver quién la está atendiendo cuando comience el trabajo.</p></article>
+            <article class="role-guide-slide"><span class="role-guide-number">03</span><h3>Consulta el historial</h3><p>En “Mis solicitudes” puedes revisar tus casos del día y solicitudes anteriores. Allí encontrarás el estado, la prioridad, el responsable y el historial completo.</p></article>
+            <article class="role-guide-slide"><span class="role-guide-number">04</span><h3>Lee las actualizaciones</h3><p>Cada respuesta del equipo TI aparece con el nombre de quien la ingresó y la fecha y hora. Revisa el detalle para conocer las acciones realizadas o la información pendiente.</p></article>
+            <article class="role-guide-slide"><span class="role-guide-number">05</span><h3>Recibe una solución</h3><p>Cuando TI termine, la solicitud cambiará a resuelta o cerrada. Podrás consultar la explicación final y el tiempo utilizado.</p></article>
           {% endif %}
         </div>
         <div class="role-guide-footer">
@@ -68,7 +67,7 @@
           </div>
           <form method="post" action="{% url 'dismiss_onboarding' %}">
             {% csrf_token %}
-            <button type="submit" class="role-guide-dismiss">No volver a mostrar</button>
+            <button type="submit" class="role-guide-dismiss" id="dismissRoleGuide" hidden>No volver a mostrar</button>
           </form>
         </div>
       </section>
@@ -76,27 +75,110 @@
     <script>document.body.classList.add('role-guide-open');</script>
   {% endif %}
 
-  {% if is_admin %}
-    <div class="dashboard-action-row">
-      <button type="button" class="btn-azerta-primary" id="openReportModal">Crear incidencia manual</button>
-    </div>
-  {% elif not is_ti %}
-    <div class="dashboard-action-row">
+  <div class="dashboard-action-row" style="justify-content: space-between; align-items: center;">
+    {% if is_admin or is_ti %}
+      <button type="button" class="btn-azerta-primary" id="openReportModal">Agregar incidencia manual</button>
+    {% else %}
       <button type="button" class="btn-azerta-primary" id="openReportModal">Nuevo Ticket de Soporte</button>
+    {% endif %}
+  </div>
+
+  {% if is_ti or is_admin %}
+    <section class="room-check-dashboard-section">
+      <div class="section-heading-row">
+        <div>
+          <span class="role-guide-kicker">Control diario</span>
+          <h2 class="panel-title">Estado de las salas</h2>
+        </div>
+        <span class="room-check-date">{{ today|date:"d/m/Y" }}</span>
+      </div>
+      <div class="room-check-grid room-check-grid-dashboard">
+        {% for room in room_checks %}
+          <article class="room-check-card room-check-summary-card">
+            <div class="room-summary-header">
+              <h3>{{ room.name }}</h3>
+              <span class="room-status-badge {% if room.checked_today %}status-green{% else %}status-red{% endif %}">
+                {% if room.checked_today %}Revisado{% else %}Pendiente{% endif %}
+              </span>
+            </div>
+            {% if room.checked_today %}
+              <p class="room-summary-reviewer">Por {{ room.reviewed_by|default:'Usuario no registrado' }}</p>
+            {% endif %}
+            <button type="button" class="room-check-button room-summary-button {% if room.all_checks_selected %}is-green{% else %}is-red{% endif %}" data-room-target="{{ forloop.counter0 }}">
+              {% if room.all_checks_selected %}Habilitada{% else %}Pendiente{% endif %}
+            </button>
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+
+    <div class="report-modal-overlay" id="roomCheckModal" aria-hidden="true">
+      <section class="report-modal room-check-modal" role="dialog" aria-modal="true" aria-labelledby="roomCheckModalTitle">
+        <div class="report-modal-header">
+          <div>
+            <span class="role-guide-kicker">Checkeo diario</span>
+            <h2 id="roomCheckModalTitle">Revisión de salas</h2>
+          </div>
+          <button type="button" class="role-guide-close" id="closeRoomCheckModal" aria-label="Cerrar revisión de salas">&times;</button>
+        </div>
+
+        <div class="room-check-grid room-check-grid-modal">
+          {% for room in room_checks %}
+            <article class="room-check-card room-check-detail" data-room-detail="{{ forloop.counter0 }}" aria-hidden="true">
+              <span class="room-status-badge {% if room.checked_today %}status-green{% else %}status-red{% endif %}">
+                {% if room.checked_today %}Revisado hoy{% else %}No revisado{% endif %}
+              </span>
+              <h3>{{ room.name }}</h3>
+
+              {% if room.checked_today %}
+                <div class="reviewed-by-box">
+                  <strong>Revisado por:</strong>
+                  <span>{{ room.reviewed_by|default:'Usuario no registrado' }}</span>
+                </div>
+              {% endif %}
+
+              <ul class="check-list">
+                {% for check in room.checks %}
+                  <li class="{% if check.checked %}is-checked{% else %}is-unchecked{% endif %}">{{ check.label }}</li>
+                {% endfor %}
+              </ul>
+
+              {% if room.can_review %}
+                <form method="post" class="room-check-form" action="{% url 'room_check' %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="room_name" value="{{ room.name }}">
+                  <input type="hidden" name="next" value="dashboard">
+                  <div class="room-check-checkboxes">
+                    <label><input type="checkbox" name="hdmi" {% if room.hdmi_checked %}checked{% endif %}> HDMI</label>
+                    <label><input type="checkbox" name="wifi_tv" {% if room.wifi_tv_checked %}checked{% endif %}> Wi‑Fi en televisión</label>
+                    <label><input type="checkbox" name="projector_wifi" {% if room.projector_wifi_checked %}checked{% endif %}> Proyección Wi‑Fi</label>
+                    {% if room.name == 'Sala 3' or room.name == 'Sala grande' %}
+                      <label><input type="checkbox" name="webcam" {% if room.webcam_checked %}checked{% endif %}> Cámara web</label>
+                    {% endif %}
+                  </div>
+                  <button type="submit" class="room-check-button is-green">{% if room.checked_today %}Actualizar revisión{% else %}Marcar como revisada{% endif %}</button>
+                </form>
+              {% else %}
+                <button type="button" class="room-check-button is-red" disabled>Sin revisar</button>
+              {% endif %}
+            </article>
+          {% endfor %}
+        </div>
+      </section>
     </div>
   {% endif %}
 
-  {% if is_admin or not is_ti %}
+  {% if user.is_authenticated %}
     <div class="report-modal-overlay" id="reportModal" aria-hidden="true">
       <section class="report-modal" role="dialog" aria-modal="true" aria-labelledby="reportModalTitle">
         <div class="report-modal-header">
           <div>
             <span class="role-guide-kicker">Mesa de Soporte</span>
-            <h2 id="reportModalTitle">{% if is_admin %}Crear incidencia manual{% else %}Nuevo Ticket de Soporte{% endif %}</h2>
+            <h2 id="reportModalTitle">{% if is_admin or is_ti %}Agregar incidencia manual{% else %}Nuevo Ticket de Soporte{% endif %}</h2>
           </div>
           <button type="button" class="role-guide-close" id="closeReportModal" aria-label="Cerrar formulario">&times;</button>
         </div>
-        {% if is_admin %}
+        {% if is_admin or is_ti %}
           <form method="post" class="login-form">
             {% csrf_token %}
             <div class="admin-form-grid">
@@ -206,12 +288,15 @@
     const guidePrevious = document.getElementById('guidePrevious');
     const guideNext = document.getElementById('guideNext');
     const guideTotal = document.getElementById('guideTotal');
+    const dismissRoleGuide = document.getElementById('dismissRoleGuide');
     let guideIndex = 0;
+    let guideHasReachedEnd = false;
 
     if (guideTotal) guideTotal.textContent = guideSlides.length;
 
     if (closeRoleGuide && roleGuideOverlay) {
       closeRoleGuide.addEventListener('click', function () {
+        if (!guideHasReachedEnd) return;
         roleGuideOverlay.remove();
         document.body.classList.remove('role-guide-open');
       });
@@ -224,6 +309,11 @@
       guideSlides[guideIndex].classList.add('is-visible');
       guideDots[guideIndex].classList.add('is-active');
       guideCurrent.textContent = guideIndex + 1;
+      if (guideIndex === guideSlides.length - 1) guideHasReachedEnd = true;
+      if (guideHasReachedEnd) {
+        closeRoleGuide.removeAttribute('hidden');
+        dismissRoleGuide.removeAttribute('hidden');
+      }
     }
 
     if (guideSlides.length) {
@@ -239,11 +329,22 @@
     const openReportModal = document.getElementById('openReportModal');
     const closeReportModal = document.getElementById('closeReportModal');
     const cancelReportModal = document.getElementById('cancelReportModal');
+    const roomCheckModal = document.getElementById('roomCheckModal');
+    const closeRoomCheckModal = document.getElementById('closeRoomCheckModal');
+    const roomSummaryButtons = document.querySelectorAll('[data-room-target]');
+    const roomDetails = document.querySelectorAll('[data-room-detail]');
 
     function closeReportDialog() {
       if (!reportModal) return;
       reportModal.classList.remove('is-open');
       reportModal.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('report-modal-open');
+    }
+
+    function closeRoomCheckDialog() {
+      if (!roomCheckModal) return;
+      roomCheckModal.classList.remove('is-open');
+      roomCheckModal.setAttribute('aria-hidden', 'true');
       document.body.classList.remove('report-modal-open');
     }
 
@@ -255,6 +356,21 @@
       });
       closeReportModal.addEventListener('click', closeReportDialog);
       cancelReportModal.addEventListener('click', closeReportDialog);
+    }
+
+    if (roomCheckModal) {
+      roomSummaryButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          roomDetails.forEach(function (detail) {
+            detail.classList.toggle('is-selected', detail.dataset.roomDetail === button.dataset.roomTarget);
+            detail.setAttribute('aria-hidden', detail.dataset.roomDetail === button.dataset.roomTarget ? 'false' : 'true');
+          });
+          roomCheckModal.classList.add('is-open');
+          roomCheckModal.setAttribute('aria-hidden', 'false');
+          document.body.classList.add('report-modal-open');
+        });
+      });
+      closeRoomCheckModal.addEventListener('click', closeRoomCheckDialog);
     }
   }());
 </script>

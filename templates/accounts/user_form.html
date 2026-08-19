@@ -6,7 +6,6 @@
 <div class="dashboard-container">
   <div class="dashboard-header">
     <h1 class="dashboard-title">{{ page_title }}</h1>
-    <p class="dashboard-subtitle">El login del usuario será su RUT sin dígito verificador.</p>
   </div>
 
   <div class="user-layout-grid">
@@ -58,7 +57,7 @@
     {% else %}
       <div class="panel-card">
         <h2 class="panel-title">Acceso inicial</h2>
-        <p class="dashboard-subtitle">La contraseña se genera como <strong>Nombre-RUT</strong>, por ejemplo: Carlos-12345678.</p>
+        <p class="dashboard-subtitle">La contraseña se genera como <strong>Inicial Nombre + Inicial apellido + * + AÑO</strong></p>
         <p class="dashboard-subtitle">Entrégala al usuario y recomienda cambiarla después del primer ingreso.</p>
       </div>
     {% endif %}

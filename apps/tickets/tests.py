@@ -2,7 +2,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from .models import Ticket, TicketResponse
+from .models import MeetingRoomCheck, Ticket, TicketResponse
 
 
 class SupportTicketsTests(TestCase):
@@ -41,6 +41,37 @@ class SupportTicketsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Test Ticket Issue')
         self.assertContains(response, 'Nuevo Ticket de Soporte')
+
+    def test_ti_dashboard_shows_room_cards_and_manual_incident_button(self):
+        self.client.login(username='ti_test', password='testpassword')
+        response = self.client.get(reverse('dashboard'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Agregar incidencia manual')
+        self.assertContains(response, 'Sala 1')
+        self.assertContains(response, 'data-room-target="0"')
+
+    def test_room_button_is_enabled_only_when_all_checks_are_selected(self):
+        MeetingRoomCheck.objects.create(
+            room_name='Sala 1', hdmi=True, wifi_tv=True, projector_wifi=True,
+            reviewed_by=self.ti_user,
+        )
+        self.client.login(username='ti_test', password='testpassword')
+        response = self.client.get(reverse('dashboard'))
+        room_checks = response.context['room_checks']
+        self.assertTrue(room_checks[0]['all_checks_selected'])
+        self.assertFalse(room_checks[1]['all_checks_selected'])
+
+    def test_ti_can_create_manual_incident(self):
+        self.client.login(username='ti_test', password='testpassword')
+        response = self.client.post(reverse('dashboard'), {
+            'title': 'Manual TI incident', 'category': Ticket.Category.NETWORK,
+            'priority': Ticket.Priority.HIGH, 'description': 'Detected by TI.',
+            'created_by': '', 'assigned_to': str(self.ti_user.pk),
+        }, follow=True)
+        self.assertEqual(response.status_code, 200)
+        manual = Ticket.objects.get(title='Manual TI incident')
+        self.assertIsNone(manual.created_by)
+        self.assertEqual(manual.assigned_to, self.ti_user)
 
     def test_regular_user_can_create_ticket(self):
         self.client.login(username='regular_test', password='testpassword')
@@ -106,6 +137,11 @@ class SupportTicketsTests(TestCase):
         self.client.login(username='admin_test', password='testpassword')
         response = self.client.get(reverse('ticket_report'), {'period': 'month'})
         self.assertEqual(response.status_code, 200)
+
+    def test_ti_cannot_access_reports(self):
+        self.client.login(username='ti_test', password='testpassword')
+        response = self.client.get(reverse('ticket_report'))
+        self.assertRedirects(response, reverse('dashboard'))
 
     def test_ticket_response_records_author_and_timestamp(self):
         self.client.login(username='admin_test', password='testpassword')

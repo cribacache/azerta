@@ -17,7 +17,7 @@
       <table class="tickets-table">
         <thead>
           <tr>
-            <th>Usuario / RUT</th>
+            <th>Usuario</th>
             <th>Nombre</th>
             <th>Correo</th>
             <th>Solicitudes</th>
@@ -30,7 +30,6 @@
             <tr>
               <td>
                 <strong>{{ account.username }}</strong>
-                {% if account.rut %}<div class="table-secondary-text">RUT: {{ account.rut }}</div>{% endif %}
               </td>
               <td>{{ account.get_full_name|default:"Sin nombre" }}</td>
               <td>{{ account.email|default:"-" }}</td>
@@ -39,11 +38,12 @@
                 {% if account.is_active %}<span class="badge badge-resolved">Activo</span>{% else %}<span class="badge badge-closed">Inactivo</span>{% endif %}
               </td>
               <td class="table-actions">
-                <a href="{% url 'user_update' account.pk %}" class="btn-azerta-secondary table-action-button">Editar / historial</a>
+                <a href="{% url 'user_update' account.pk %}" class="btn-azerta-secondary table-action-button">Editar</a>
+                <a href="{% url 'user_update' account.pk %}" class="btn-azerta-secondary table-action-button">Historial</a>
                 {% if account != user %}
-                  <form method="post" action="{% url 'user_delete' account.pk %}" class="inline-action-form" onsubmit="return confirm('{% if account.tickets.all %}¿Desactivar este usuario para conservar su historial?{% else %}¿Eliminar este usuario?{% endif %}');">
+                  <form method="post" action="{% url 'user_delete' account.pk %}" class="inline-action-form" onsubmit="return confirm('{% if not account.is_active %}¿Activar este usuario?{% elif account.tickets.all %}¿Desactivar este usuario para conservar su historial?{% else %}¿Eliminar este usuario?{% endif %}');">
                     {% csrf_token %}
-                    <button type="submit" class="btn-azerta-secondary table-action-button">{% if account.tickets.all %}Desactivar{% else %}Eliminar{% endif %}</button>
+                    <button type="submit" class="btn-azerta-secondary table-action-button">{% if not account.is_active %}Activar{% elif account.tickets.all %}Desactivar{% else %}Eliminar{% endif %}</button>
                   </form>
                 {% endif %}
               </td>

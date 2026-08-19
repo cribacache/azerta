@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Checkeo diario de salas | Azerta{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <div>
+      <h1 class="dashboard-title">Checkeo diario de salas</h1>
+      <p class="dashboard-subtitle">Revisión rápida de las salas habilitadas del edificio.</p>
+    </div>
+  </div>
+
+  <div class="room-check-grid">
+    {% for room in rooms %}
+      <article class="room-check-card">
+        <span class="room-status-badge {% if room.checked_today %}status-green{% else %}status-red{% endif %}">
+          {% if room.checked_today %}Revisado hoy{% else %}No revisado{% endif %}
+        </span>
+        <h3>{{ room.name }}</h3>
+
+        {% if room.checked_today %}
+          <div class="reviewed-by-box">
+            <strong>Revisado por:</strong>
+            <span>{{ room.reviewed_by|default:'Usuario no registrado' }}</span>
+          </div>
+        {% endif %}
+
+        <ul class="check-list">
+          {% for check in room.checks %}
+            <li class="{% if check.checked %}is-checked{% else %}is-unchecked{% endif %}">{{ check.label }}</li>
+          {% endfor %}
+        </ul>
+
+        {% if room.can_review and not room.checked_today %}
+          <form method="post" class="room-check-form">
+            {% csrf_token %}
+            <input type="hidden" name="room_name" value="{{ room.name }}">
+            <div class="room-check-checkboxes">
+              <label><input type="checkbox" name="hdmi" {% if room.name == 'Sala 1' %}checked{% endif %}> HDMI</label>
+              <label><input type="checkbox" name="wifi_tv"> Wi‑Fi en televisión</label>
+              <label><input type="checkbox" name="projector_wifi"> Proyección Wi‑Fi</label>
+              {% if room.name == 'Sala 3' or room.name == 'Sala grande' %}
+                <label><input type="checkbox" name="webcam"> Cámara web</label>
+              {% endif %}
+            </div>
+            <button type="submit" class="room-check-button is-green">Marcar como revisada</button>
+          </form>
+        {% elif room.checked_today %}
+          <button type="button" class="room-check-button is-green" disabled>Verificada</button>
+        {% else %}
+          <button type="button" class="room-check-button is-red" disabled>Sin revisar</button>
+        {% endif %}
+      </article>
+    {% empty %}
+      <div class="empty-state"><p>No hay salas configuradas para revisión.</p></div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

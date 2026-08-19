@@ -5,6 +5,34 @@ from django.conf import settings
 from django.utils import timezone
 
 
+class MeetingRoomCheck(models.Model):
+    """Daily room inspection record with the user who performed it."""
+    room_name = models.CharField(max_length=50, verbose_name='Sala')
+    review_date = models.DateField(verbose_name='Fecha de revisión', auto_now_add=True)
+    hdmi = models.BooleanField(default=False, verbose_name='HDMI')
+    wifi_tv = models.BooleanField(default=False, verbose_name='Wi‑Fi en televisión')
+    projector_wifi = models.BooleanField(default=False, verbose_name='Proyección Wi‑Fi')
+    webcam = models.BooleanField(default=False, verbose_name='Cámara web')
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='room_reviews',
+        verbose_name='Revisado por',
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('room_name', 'review_date')
+        verbose_name = 'Checkeo de sala'
+        verbose_name_plural = 'Checkeos de salas'
+
+    def __str__(self):
+        return f'{self.room_name} - {self.review_date}'
+
+
 class Ticket(models.Model):
     """
     Support ticket model for Azerta helpdesk.
